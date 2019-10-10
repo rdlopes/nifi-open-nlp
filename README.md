@@ -41,6 +41,8 @@ available on the port 8080.
 The configuration directory for NiFi (`$NIFI_HOME/conf` or `/opt/nifi/nifi-current/conf`)
 has been mapped to the local folder `./nifi-local-data/conf`.
 
+#### NLP models
+
 A new NiFi folder exists under `$NIFI_HOME/models` that contains the pre-trained
 models for English language:
 
@@ -57,3 +59,19 @@ models for English language:
 * `en-pos-perceptron.bin`
 * `en-sent.bin`
 * `en-token.bin`
+* `langdetect-183.bin`
+
+#### NLP training
+
+A new NiFi folder exists under `$NIFI_HOME/training` that contains `tweets.txt`, an example of training data
+for sentiment analysis on tweets (see [Documennt Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat))
+taken from [this discussion](https://stackoverflow.com/questions/44781094/sentiment-analysis-with-opennlp) on StackOverflow.
+
+#### NLP model store
+
+Another new folder under `$NIFI_HOME/model-store` is present and will hold the trained models for the processors.
+
+The rationale is that processors can be trained using both model files, training files and training data so input types differ, 
+but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
+training/evaluation will be explained further.
+
