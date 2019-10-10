@@ -1,6 +1,6 @@
 # nifi-open-nlp
 
-A set of [NiFi](https://nifi.apache.org) processors implementing Apache NLP engine tools.
+A set of [NiFi](https://nifi.apache.org) processors implementing [Apache OpenNLP](https://opennlp.apache.org/) engine tools.
 
 ## Project structure
 
