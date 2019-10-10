@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  nifi:
+    build:
+      context: .
+    image: org.rdlopes/nifi
+    container_name: nifi
+    volumes:
+      - type: bind
+        source: ./nifi-local-data/conf
+        target: /opt/nifi/nifi-current/conf
+      - type: bind
+        source: ./nifi-local-data/models
+        target: /opt/nifi/nifi-current/models
+      - type: bind
+        source: ./nifi-local-data/model-store
+        target: /opt/nifi/nifi-current/nlp/model-store
+      - type: bind
+        source: ./nifi-local-data/training
+        target: /opt/nifi/nifi-current/training
+    ports:
+      - 8080:8080
+      - 9000:9000
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080

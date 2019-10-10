@@ -1,6 +1,11 @@
+### Maven ###
 **/target/
 !**/src/main/**
 !**/src/test/**
 
+### IntelliJ ###
 .idea
 *.iml
+
+### Docker ###
+nifi-local-data/conf/archive/
