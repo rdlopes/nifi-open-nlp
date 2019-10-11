@@ -1,0 +1,21 @@
+language: java
+sudo: false
+install: true
+
+addons:
+  sonarcloud:
+    organization: "rdlopes"
+    token:
+      secure: TUhQIl2XvBIg+F7lNZUGhzeFJxc0Tvpzai0xm+GyQvUTiDxYgmtpEP+SrYjicBILU6AHBCjRXGAQuWmtPECWAZin/HXKt5IHgp6jOj7OuVEE/D6DjtnCC58+FGW3/XHqFXXj5GXn2+DHc9o6oh4msammrAr+HyvxDgpdCpiq2HCzcOEe6OFqH3p5frgTPEwXUUmYTtplS5hxBQGUevBDJrsHI8GbLy0Gd7m+S6JAPILClyR0/SOXNyhS434C7boloY3kOZC8KD7WgdLq/yn6b24B1ACqQCt7DI/nRFY14gE54d9bgNq6rzQ0bD+aBemTlb+zpnRh+rWGd1MGX+4CrVe7cq3+hqyXRbuG6TUW8dNNO4HOEhig9Ts+j/ZQj+x95sbs/WPWcYEogR/Yph8hcfmjGIq60ocWobMcFGFZ3TSd6aLFTU1O86zzKW0oO/k50Q9mI/UoqI7snLJkT/BZywiRgSiG9EUXj94CgPx+zCunkYzT3X7S/rNzJypHR2vDCprm01GjEbrozIYTw1jSHGvizgFfLxZoizHWizDU+AliQPqwdq0vGzsx3CV0XePnRZf69DOzzpxaRb3FUHWOAiJHHBzIFwgzxHOpvacALBodNvoHpTYkk7xyn/SmpT2DvImc0HffIglswGafzjd6uqeuCs+5zJ8w/vA2pMiNufM=
+
+jdk:
+  - oraclejdk8
+
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
