@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>CategorizeDocument</title>
+    <link href="../../../../../css/component-usage.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<p>This processor takes in a record set and counts both the overall count and counts that are defined as dynamic properties
+    that map a property name to a record path. Record path counts are provided at two levels:</p>
+<ul>
+    <li>The overall count of all records that successfully evaluated a record path.</li>
+    <li>A breakdown of counts of unique values that matched the record path operation.</li>
+</ul>
+<p>Consider the following record structure:</p>
+<pre>
+        {
+            "sport": "Soccer",
+            "name": "John Smith"
+        }
+    </pre>
+<p>A valid mapping here would be <em>sport => /sport</em>.</p>
+<p>For a record set with JSON like that, five entries and 3 instances of soccer and two instances of football, it would set the following
+    attributes:</p>
+<ul>
+    <li>record_count: 5</li>
+    <li>sport: 5</li>
+    <li>sport.Soccer: 3</li>
+    <li>sport.Football: 2</li>
+</ul>
+</body>
+</html>

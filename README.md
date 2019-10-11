@@ -43,7 +43,7 @@ available on the port 8080.
 The configuration directory for NiFi (`$NIFI_HOME/conf` or `/opt/nifi/nifi-current/conf`)
 has been mapped to the local folder `./nifi-local-data/conf`.
 
-#### NLP models
+#### NLP models folder
 
 A new NiFi folder exists under `$NIFI_HOME/models` that contains the pre-trained
 models for English language:
@@ -77,3 +77,20 @@ The rationale is that processors can be trained using both model files, training
 but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
 training/evaluation will be explained further.
 
+## Apache NLP tools
+
+Following tools listed in the 
+[OpenNLP developer documentation](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html) 
+are implemented:
+
+* [Language Detector](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.langdetect)
+* [Sentence Detector](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.sentdetect)
+* [Tokenizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.tokenizer)
+* [Name Finder](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.namefind)
+* [Document Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat)
+* [Part-of-Speech Tagger](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.postagger)
+* [Lemmatizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.lemmatizer)
+* [Chunker](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.chunker)
+* [Parser](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.parser)
+
+For further documentation, please refer to processors usage page.

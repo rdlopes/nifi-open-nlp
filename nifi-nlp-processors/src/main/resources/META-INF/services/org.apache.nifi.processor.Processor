@@ -1,0 +1,9 @@
+org.rdlopes.processors.opennlp.CategorizeDocument
+org.rdlopes.processors.opennlp.Chunk
+org.rdlopes.processors.opennlp.DetectLanguage
+org.rdlopes.processors.opennlp.DetectSentences
+org.rdlopes.processors.opennlp.FindNames
+org.rdlopes.processors.opennlp.Lemmatize
+org.rdlopes.processors.opennlp.Parse
+org.rdlopes.processors.opennlp.TagPartOfSpeech
+org.rdlopes.processors.opennlp.Tokenize
