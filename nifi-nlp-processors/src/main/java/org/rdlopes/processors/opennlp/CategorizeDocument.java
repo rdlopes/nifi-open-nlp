@@ -13,6 +13,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,6 +25,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.CategorizeDocument.*;
 
 @NlpProcessor
@@ -58,9 +61,9 @@ public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
     public CategorizeDocument() {super(DoccatModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, DoccatModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
-        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(trainingModel);
+        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(getModel());
         String[] splitContent = content.split("\\n");
         double[] results = documentCategorizer.categorize(splitContent);
 

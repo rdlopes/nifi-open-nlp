@@ -16,6 +16,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -128,7 +129,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
     }
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ParserModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
 
         int numParses = context.getProperty(PROPERTY_NUM_PARSES)
@@ -142,7 +143,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
                                           .asDouble();
         List<String> tokensList = Arrays.asList(attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST)));
 
-        Parser parser = ParserFactory.create(trainingModel, beamSize, advancePercentage);
+        Parser parser = ParserFactory.create(getModel(), beamSize, advancePercentage);
         final opennlp.tools.parser.Parse[] parses = parser.parse(createParseSource(tokensList), numParses);
 
         final List<String> parseCollection = Arrays.stream(parses).map(parse -> {

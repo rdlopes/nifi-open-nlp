@@ -15,6 +15,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,6 +25,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
@@ -56,9 +59,9 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
     public TagPartOfSpeech() {super(POSModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, POSModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
-        POSTagger tagger = new POSTaggerME(trainingModel);
+        POSTagger tagger = new POSTaggerME(getModel());
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
         String[] tagsList = tagger.tag(tokensList);

@@ -11,12 +11,15 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.DetectLanguage.*;
 
 @NlpProcessor
@@ -46,10 +49,10 @@ public class DetectLanguage extends AbstractNlpProcessor<LanguageDetectorModel> 
     public DetectLanguage() {super(LanguageDetectorModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, LanguageDetectorModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         // LanguageDetectorME
         Map<String, String> evaluation = new HashMap<>();
-        LanguageDetector languageDetector = new LanguageDetectorME(trainingModel);
+        LanguageDetector languageDetector = new LanguageDetectorME(getModel());
         Language predictedLanguage = languageDetector.predictLanguage(content);
         Language[] probableLanguageList = languageDetector.predictLanguages(content);
         String[] supportedLanguages = languageDetector.getSupportedLanguages();

@@ -13,6 +13,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -23,6 +24,8 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.Chunk.*;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION;
@@ -63,12 +66,12 @@ public class Chunk extends AbstractNlpProcessor<ChunkerModel> {
     public Chunk() {super(ChunkerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ChunkerModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
-        ChunkerME chunker = new ChunkerME(trainingModel);
+        ChunkerME chunker = new ChunkerME(getModel());
 
         String[] chunks = chunker.chunk(tokensList, tagsList);
         Span[] chunkAsSpans = chunker.chunkAsSpans(tokensList, tagsList);

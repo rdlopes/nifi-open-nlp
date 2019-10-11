@@ -16,6 +16,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,6 +29,8 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.INTEGER_VALIDATOR;
 import static org.apache.nifi.processor.util.StandardValidators.NUMBER_VALIDATOR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.Lemmatize.*;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION;
@@ -116,7 +119,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
     public Lemmatize() {super(LemmatizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, LemmatizerModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         final int lemmasSearchCount = context.getProperty(PROPERTY_LEMMAS_SEARCH_COUNT).evaluateAttributeExpressions().asInteger();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
@@ -127,7 +130,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
                                                "(" + tagsList.length + " tags, " + tokensList.length + " tokens).");
         }
 
-        LemmatizerME lemmatizer = new LemmatizerME(trainingModel);
+        LemmatizerME lemmatizer = new LemmatizerME(getModel());
         String[] results = lemmatizer.lemmatize(tokensList, tagsList);
         String[][] lemmasPrediction = lemmatizer.predictLemmas(lemmasSearchCount, tokensList, tagsList);
         String[] sesPrediction = lemmatizer.predictSES(tokensList, tagsList);

@@ -5,21 +5,15 @@ import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
-
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.*;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.PROPERTY_TRAINING_DATA;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.PROPERTY_TRAINING_FILE_PATH;
 
 public abstract class AbstractNlpProcessorTest {
     private final boolean ensureTrainingDataPresence;
 
     private final Class<? extends Processor> processClass;
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     TestRunner testRunner;
 
@@ -29,9 +23,8 @@ public abstract class AbstractNlpProcessorTest {
     }
 
     @Before
-    public void init() throws IOException {
+    public void init() {
         testRunner = TestRunners.newTestRunner(processClass);
-        testRunner.setProperty(PROPERTY_MODEL_STORE_PATH, testFolder.newFolder("model-store").getAbsolutePath());
     }
 
     @Test

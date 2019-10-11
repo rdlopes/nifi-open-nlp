@@ -2,7 +2,7 @@ package org.rdlopes.processors.opennlp;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import opennlp.tools.ml.model.Sequence;
+import opennlp.tools.util.Sequence;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 

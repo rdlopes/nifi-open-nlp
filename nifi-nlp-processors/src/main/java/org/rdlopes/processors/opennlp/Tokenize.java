@@ -17,6 +17,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.context.PropertyContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,6 +30,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.DetectSentences.ATTRIBUTE_SENTDET_CHUNK_LIST;
 import static org.rdlopes.processors.opennlp.FindNames.ATTRIBUTE_NAMEFIND_PROBABILITIES;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION;
@@ -84,7 +87,7 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
     public Tokenize() {super(TokenizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, TokenizerModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         final TokenizerType tokenizerType = TokenizerType.valueOf(context.getProperty(PROPERTY_TOKENIZER_TYPE)
                                                                          .evaluateAttributeExpressions()
@@ -99,7 +102,7 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
                 tokenizer = SimpleTokenizer.INSTANCE;
                 break;
             case LEARNABLE:
-                tokenizer = new TokenizerME(trainingModel);
+                tokenizer = new TokenizerME(getModel());
                 break;
             default:
                 throw new IllegalArgumentException("tokenizer type cannot be null");

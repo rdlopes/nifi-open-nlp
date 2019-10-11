@@ -16,6 +16,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
+import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -28,6 +29,8 @@ import static java.util.stream.Collectors.toList;
 import static opennlp.tools.util.Span.spansToStrings;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
+import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.FindNames.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
@@ -71,11 +74,11 @@ public class FindNames extends AbstractNlpProcessor<TokenNameFinderModel> {
     public FindNames() {super(TokenNameFinderModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, TokenNameFinderModel trainingModel, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
-        NameFinderME nameFinder = new NameFinderME(trainingModel);
+        NameFinderME nameFinder = new NameFinderME(getModel());
         Span[] nameSpans = nameFinder.find(tokensList);
         String[] nameList = spansToStrings(nameSpans, tokensList);
         double[] probabilities = nameFinder.probs();
