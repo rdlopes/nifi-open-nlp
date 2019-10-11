@@ -18,7 +18,6 @@ import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
-import org.apache.nifi.processor.exception.ProcessException;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,29 +37,20 @@ import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGIST
 import static org.apache.nifi.processor.util.StandardValidators.*;
 
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcessor {
+abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcessor {
 
-    public static final String ATTRIBUTE_NLP_ERROR = "nlp.error";
+    static final String ATTRIBUTE_NLP_ERROR = "nlp.error";
 
-    public static final String ATTRIBUTE_NLP_ERROR_DESCRIPTION = "Error message raised by processing the content, if any.";
+    static final String ATTRIBUTE_NLP_ERROR_DESCRIPTION = "Error message raised by processing the content, if any.";
 
-    public static final PropertyDescriptor PROPERTY_CHARACTER_SET = new PropertyDescriptor.Builder()
-            .name("Character Set")
-            .description("The Character Set in which the content is encoded")
-            .required(true)
-            .addValidator(CHARACTER_SET_VALIDATOR)
-            .expressionLanguageSupported(VARIABLE_REGISTRY)
-            .defaultValue("UTF-8")
-            .build();
-
-    public static final PropertyDescriptor PROPERTY_MODEL_FILE_PATH = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_MODEL_FILE_PATH = new PropertyDescriptor.Builder()
             .name("Training model")
             .description("Path to the model for the NLP engine.")
             .required(false)
             .addValidator(NON_BLANK_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_ALGORITHM = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_TRAINING_ALGORITHM = new PropertyDescriptor.Builder()
             .name("Training algorithm")
             .description("Training parameter (ALGORITHM_PARAM).")
             .required(true)
@@ -72,7 +62,7 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             .defaultValue(GISTrainer.MAXENT_VALUE)
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_CUTOFF = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_TRAINING_CUTOFF = new PropertyDescriptor.Builder()
             .name("Training cut off")
             .description("Training parameter (CUTOFF_PARAM).")
             .required(true)
@@ -81,30 +71,21 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             .defaultValue(String.valueOf(5))
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_DATA = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_TRAINING_DATA = new PropertyDescriptor.Builder()
             .name("Training data")
             .description("The data used to train the model, in the format expected by Apache Open NLP tool.")
             .required(false)
             .addValidator(NON_BLANK_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_FILE_PATH = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_TRAINING_FILE_PATH = new PropertyDescriptor.Builder()
             .name("Training file path")
             .description("Path to the training file containing data to train the model.")
             .required(false)
             .addValidator(NON_BLANK_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_ITERATIONS = new PropertyDescriptor.Builder()
-            .name("Training iterations")
-            .description("Training parameter (ITERATIONS_PARAM)")
-            .required(true)
-            .expressionLanguageSupported(VARIABLE_REGISTRY)
-            .addValidator(INTEGER_VALIDATOR)
-            .defaultValue(String.valueOf(100))
-            .build();
-
-    public static final PropertyDescriptor PROPERTY_TRAINING_LANGUAGE = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_TRAINING_LANGUAGE = new PropertyDescriptor.Builder()
             .name("Training language")
             .description("The language code to use for detection.")
             .required(true)
@@ -113,7 +94,25 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             .defaultValue("en")
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_THREADS = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_CHARACTER_SET = new PropertyDescriptor.Builder()
+            .name("Character Set")
+            .description("The Character Set in which the content is encoded")
+            .required(true)
+            .addValidator(CHARACTER_SET_VALIDATOR)
+            .expressionLanguageSupported(VARIABLE_REGISTRY)
+            .defaultValue("UTF-8")
+            .build();
+
+    private static final PropertyDescriptor PROPERTY_TRAINING_ITERATIONS = new PropertyDescriptor.Builder()
+            .name("Training iterations")
+            .description("Training parameter (ITERATIONS_PARAM)")
+            .required(true)
+            .expressionLanguageSupported(VARIABLE_REGISTRY)
+            .addValidator(INTEGER_VALIDATOR)
+            .defaultValue(String.valueOf(100))
+            .build();
+
+    private static final PropertyDescriptor PROPERTY_TRAINING_THREADS = new PropertyDescriptor.Builder()
             .name("Training threads")
             .description("Training parameter (THREADS_PARAM).")
             .required(true)
@@ -122,7 +121,7 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             .defaultValue(String.valueOf(1))
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_TYPE = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_TRAINING_TYPE = new PropertyDescriptor.Builder()
             .name("Training type")
             .description("Training parameter (TRAINER_TYPE_PARAM).")
             .required(true)
@@ -131,7 +130,7 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             .defaultValue(EventTrainer.EVENT_VALUE)
             .build();
 
-    public static final PropertyDescriptor PROPERTY_TRAINING_VERBOSE = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_TRAINING_VERBOSE = new PropertyDescriptor.Builder()
             .name("Training verbose")
             .description("Training parameter (VERBOSE_PARAM).")
             .required(true)
@@ -160,16 +159,13 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Arrays.asList(
             PROPERTY_MODEL_FILE_PATH, PROPERTY_CHARACTER_SET,
-            PROPERTY_TRAINING_CUTOFF, PROPERTY_TRAINING_ITERATIONS, PROPERTY_TRAINING_ALGORITHM, PROPERTY_TRAINING_VERBOSE,
+            PROPERTY_TRAINING_CUTOFF, PROPERTY_TRAINING_ITERATIONS, PROPERTY_TRAINING_ALGORITHM, PROPERTY_TRAINING_VERBOSE, PROPERTY_TRAINING_THREADS, PROPERTY_TRAINING_TYPE,
             PROPERTY_TRAINING_FILE_PATH, PROPERTY_TRAINING_DATA);
 
     @Getter
     private M model;
 
-    @Getter
-    private String modelFile;
-
-    protected AbstractNlpProcessor(Class<M> modelClass) {this.modelClass = modelClass;}
+    AbstractNlpProcessor(Class<M> modelClass) {this.modelClass = modelClass;}
 
     String[] attributeAsStringArray(String value) {
         return Optional.ofNullable(value)
@@ -219,11 +215,11 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
         return results;
     }
 
-    protected abstract Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) throws IOException;
+    protected abstract Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes);
 
     protected abstract M doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException;
 
-    protected boolean isTrainingRequired(PropertyContext context) {
+    boolean isTrainingRequired(PropertyContext context) {
         return Optional.ofNullable(context).isPresent();
     }
 
@@ -241,13 +237,13 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
                                 .valid(false)
                                 .input(String.valueOf(parameters))
                                 .subject("Loading model failed")
-                                .explanation("NLP engine training failed:" + e.getMessage())
+                                .explanation(e.getMessage())
                                 .build());
         }
     }
 
     @Override
-    public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
+    public void onTrigger(ProcessContext context, ProcessSession session) {
         Optional.ofNullable(session.get()).ifPresent(flowFile -> {
             final Charset charset = Charset.forName(context.getProperty(PROPERTY_CHARACTER_SET).evaluateAttributeExpressions().getValue());
             AtomicReference<String> flowFileContent = new AtomicReference<>();
@@ -257,10 +253,10 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
             Relationship relationship = RELATIONSHIP_UNMATCHED;
 
             try {
-                attributes.putAll(doEvaluate(context, session, flowFileContent.get(), attributes));
+                attributes.putAll(doEvaluate(context, flowFileContent.get(), attributes));
                 relationship = RELATIONSHIP_SUCCESS;
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 getLogger().warn("Error while evaluating content", e);
                 attributes.put(ATTRIBUTE_NLP_ERROR, e.getMessage());
 
@@ -285,7 +281,7 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
                                 .valid(false)
                                 .input(String.valueOf(parameters))
                                 .subject("Training from data failed")
-                                .explanation("NLP engine training failed:" + e.getMessage())
+                                .explanation(e.getMessage())
                                 .build());
         }
     }
@@ -303,7 +299,7 @@ public abstract class AbstractNlpProcessor<M extends BaseModel> extends Abstract
                                 .valid(false)
                                 .input(String.valueOf(parameters))
                                 .subject("Training from file failed")
-                                .explanation("NLP engine training failed:" + e.getMessage())
+                                .explanation(e.getMessage())
                                 .build());
         }
     }

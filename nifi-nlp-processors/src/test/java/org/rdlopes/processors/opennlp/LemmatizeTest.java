@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.*;
 import static org.rdlopes.processors.opennlp.Lemmatize.*;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;

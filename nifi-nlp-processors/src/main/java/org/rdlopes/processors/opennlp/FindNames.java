@@ -16,7 +16,6 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,8 +28,6 @@ import static java.util.stream.Collectors.toList;
 import static opennlp.tools.util.Span.spansToStrings;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.FindNames.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
@@ -38,26 +35,21 @@ import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_L
 @NlpProcessor
 @Tags({"apache", "nlp", "names", "finder"})
 @CapabilityDescription("Find names placed in the content of a flow file.")
-@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST,
-                                  description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION)})
-@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR,
-                                    description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_NAME_LIST,
-                                    description = "Holds  the list of names found in flow file content, as a JSON strings list."),
-                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_NAME_SPANS,
-                                    description = "Holds  the list of names spans found in flow file content, as a JSON span list."),
-                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_PROBABILITIES,
-                                    description = "Holds probabilities for each span prediction from flow file content.")})
+@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST, description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION)})
+@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR, description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_NAME_LIST, description = "Holds  the list of names found in flow file content, as a JSON strings list."),
+                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_NAME_SPANS, description = "Holds  the list of names spans found in flow file content, as a JSON span list."),
+                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_PROBABILITIES, description = "Holds probabilities for each span prediction from flow file content.")})
 @EqualsAndHashCode(callSuper = true)
 public class FindNames extends AbstractNlpProcessor<TokenNameFinderModel> {
 
-    public static final String ATTRIBUTE_NAMEFIND_NAME_LIST = "nlp.namefind.name.list";
+    static final String ATTRIBUTE_NAMEFIND_NAME_LIST = "nlp.namefind.name.list";
 
-    public static final String ATTRIBUTE_NAMEFIND_NAME_SPANS = "nlp.namefind.name.spans";
+    static final String ATTRIBUTE_NAMEFIND_NAME_SPANS = "nlp.namefind.name.spans";
 
-    public static final String ATTRIBUTE_NAMEFIND_PROBABILITIES = "nlp.namefind.probabilities";
+    static final String ATTRIBUTE_NAMEFIND_PROBABILITIES = "nlp.namefind.probabilities";
 
-    public static final PropertyDescriptor PROPERTY_NAME_TYPE = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_NAME_TYPE = new PropertyDescriptor.Builder()
             .name("Name type")
             .description("The name type to look for (might depend on the model selected).")
             .required(true)
@@ -74,7 +66,7 @@ public class FindNames extends AbstractNlpProcessor<TokenNameFinderModel> {
     public FindNames() {super(TokenNameFinderModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 

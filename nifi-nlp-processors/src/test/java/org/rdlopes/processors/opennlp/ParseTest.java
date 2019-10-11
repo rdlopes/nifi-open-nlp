@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.*;
 import static org.rdlopes.processors.opennlp.Parse.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 

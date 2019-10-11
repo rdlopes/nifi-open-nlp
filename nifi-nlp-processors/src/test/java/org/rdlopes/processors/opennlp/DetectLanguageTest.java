@@ -9,7 +9,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.*;
 import static org.rdlopes.processors.opennlp.DetectLanguage.*;
 
 public class DetectLanguageTest extends AbstractNlpProcessorTest {

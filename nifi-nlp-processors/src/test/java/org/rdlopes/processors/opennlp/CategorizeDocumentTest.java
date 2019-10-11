@@ -11,7 +11,6 @@ import java.util.Set;
 
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.*;
 import static org.rdlopes.processors.opennlp.CategorizeDocument.*;
 
 public class CategorizeDocumentTest extends AbstractNlpProcessorTest {

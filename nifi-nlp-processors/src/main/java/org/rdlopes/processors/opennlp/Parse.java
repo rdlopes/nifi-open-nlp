@@ -16,7 +16,6 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,27 +31,32 @@ import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGIST
 import static org.apache.nifi.processor.util.StandardValidators.*;
 import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
 import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
-import static org.rdlopes.processors.opennlp.Parse.ATTRIBUTE_PARSER_PARSE_COUNT;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
 
 @NlpProcessor
 @Tags({"apache", "nlp", "parser"})
 @CapabilityDescription("Parses the content of a flow file.")
-@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST,
-                                  description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION)})
-@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR,
-                                    description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_PARSER_PARSE_COUNT,
-                                    description = "The number of parses evaluated, eg. the 'Top parses list size' parameter, or fewer.")})
+@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST, description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION)})
+@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR, description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
+                   @WritesAttribute(attribute = Parse.ATTRIBUTE_PARSER_PARSE_COUNT, description = "The number of parses evaluated, eg. the 'Top parses list size' parameter, or fewer.")})
 @EqualsAndHashCode(callSuper = true)
 public class Parse extends AbstractNlpProcessor<ParserModel> {
 
-    public static final String ATTRIBUTE_PARSER_PARSE_COUNT = "nlp.parser.parse.count";
+    static final String ATTRIBUTE_PARSER_PARSE_COUNT = "nlp.parser.parse.count";
 
-    public static final String ATTRIBUTE_PARSER_PARSE_LIST = "nlp.parser.parse.list";
+    static final String ATTRIBUTE_PARSER_PARSE_LIST = "nlp.parser.parse.list";
 
-    public static final PropertyDescriptor PROPERTY_ADVANCE_PERCENTAGE = new PropertyDescriptor.Builder()
+    static final PropertyDescriptor PROPERTY_NUM_PARSES = new PropertyDescriptor.Builder()
+            .name("Top parses list size")
+            .description("The number of parses that the tool should evaluate (1-10).")
+            .required(true)
+            .expressionLanguageSupported(VARIABLE_REGISTRY)
+            .addValidator(INTEGER_VALIDATOR)
+            .defaultValue("1")
+            .build();
+
+    private static final PropertyDescriptor PROPERTY_ADVANCE_PERCENTAGE = new PropertyDescriptor.Builder()
             .name("Advance percentage")
             .description("Advance percentage for parser setup, as a float number between 0 and 1.")
             .required(true)
@@ -61,7 +65,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
             .defaultValue(String.valueOf(AbstractBottomUpParser.defaultAdvancePercentage))
             .build();
 
-    public static final PropertyDescriptor PROPERTY_BEAM_SIZE = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_BEAM_SIZE = new PropertyDescriptor.Builder()
             .name("Beam size")
             .description("Beam size for parser setup, as an integer.")
             .required(true)
@@ -70,7 +74,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
             .defaultValue(String.valueOf(AbstractBottomUpParser.defaultBeamSize))
             .build();
 
-    public static final PropertyDescriptor PROPERTY_HEAD_RULES_FILE_PATH = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_HEAD_RULES_FILE_PATH = new PropertyDescriptor.Builder()
             .name("Head rules file path")
             .description("Head rules file path for training the model " +
                          "(only required if training data or training file are set).")
@@ -80,16 +84,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
             .defaultValue("${NIFI_HOME}/models/en-head_rules")
             .build();
 
-    public static final PropertyDescriptor PROPERTY_NUM_PARSES = new PropertyDescriptor.Builder()
-            .name("Top parses list size")
-            .description("The number of parses that the tool should evaluate (1-10).")
-            .required(true)
-            .expressionLanguageSupported(VARIABLE_REGISTRY)
-            .addValidator(INTEGER_VALIDATOR)
-            .defaultValue("1")
-            .build();
-
-    public static final PropertyDescriptor PROPERTY_PARSER_TYPE = new PropertyDescriptor.Builder()
+    private static final PropertyDescriptor PROPERTY_PARSER_TYPE = new PropertyDescriptor.Builder()
             .name("Parser type")
             .description("The type of parser to use.")
             .required(true)
@@ -129,7 +124,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
     }
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
 
         int numParses = context.getProperty(PROPERTY_NUM_PARSES)

@@ -13,7 +13,6 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -32,26 +31,22 @@ import static org.rdlopes.processors.opennlp.CategorizeDocument.*;
 @NlpProcessor
 @Tags({"apache", "nlp", "document", "categorizer"})
 @CapabilityDescription("Enriches flow file attributes with information about document category, as found by NLP engine.")
-@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR,
-                                    description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_BEST,
-                                    description = "Holds the best category name found by trained model."),
-                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_COUNT,
-                                    description = "Holds the category count for the categories found by the trained model."),
-                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_LIST,
-                                    description = "Holds the list of categories found by the trained model, as a JSON list."),
-                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_SORTED_SCORE_MAP,
-                                    description = "Holds the results of evaluating content with the trained model, as a <double, list<string>> JSON map.")})
+@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR, description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_BEST, description = "Holds the best category name found by trained model."),
+                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_COUNT, description = "Holds the category count for the categories found by the trained model."),
+                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_CATEGORY_LIST, description = "Holds the list of categories found by the trained model, as a JSON list."),
+                   @WritesAttribute(attribute = ATTRIBUTE_DOCCAT_SORTED_SCORE_MAP, description = "Holds the results of evaluating content with the trained model, " +
+                                                                                                 "as a <double, list<string>> JSON map.")})
 @EqualsAndHashCode(callSuper = true)
 public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
 
-    public static final String ATTRIBUTE_DOCCAT_CATEGORY_BEST = "nlp.doccat.category.best";
+    static final String ATTRIBUTE_DOCCAT_CATEGORY_BEST = "nlp.doccat.category.best";
 
-    public static final String ATTRIBUTE_DOCCAT_CATEGORY_COUNT = "nlp.doccat.category.count";
+    static final String ATTRIBUTE_DOCCAT_CATEGORY_COUNT = "nlp.doccat.category.count";
 
-    public static final String ATTRIBUTE_DOCCAT_CATEGORY_LIST = "nlp.doccat.category.list";
+    static final String ATTRIBUTE_DOCCAT_CATEGORY_LIST = "nlp.doccat.category.list";
 
-    public static final String ATTRIBUTE_DOCCAT_SORTED_SCORE_MAP = "nlp.doccat.sorted.score.map";
+    static final String ATTRIBUTE_DOCCAT_SORTED_SCORE_MAP = "nlp.doccat.sorted.score.map";
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(Stream.of(PROPERTY_TRAINING_LANGUAGE),
@@ -61,7 +56,7 @@ public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
     public CategorizeDocument() {super(DoccatModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         DocumentCategorizer documentCategorizer = new DocumentCategorizerME(getModel());
         String[] splitContent = content.split("\\n");

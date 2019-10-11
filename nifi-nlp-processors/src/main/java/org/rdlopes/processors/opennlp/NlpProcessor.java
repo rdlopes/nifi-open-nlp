@@ -20,5 +20,5 @@ import static org.apache.nifi.annotation.behavior.InputRequirement.Requirement.I
 @EventDriven
 @SupportsBatching
 @InputRequirement(INPUT_REQUIRED)
-public @interface NlpProcessor {
+@interface NlpProcessor {
 }

@@ -17,7 +17,6 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.context.PropertyContext;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,8 +29,6 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
-import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
 import static org.rdlopes.processors.opennlp.DetectSentences.ATTRIBUTE_SENTDET_CHUNK_LIST;
 import static org.rdlopes.processors.opennlp.FindNames.ATTRIBUTE_NAMEFIND_PROBABILITIES;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION;
@@ -40,30 +37,24 @@ import static org.rdlopes.processors.opennlp.Tokenize.*;
 @NlpProcessor
 @Tags({"apache", "nlp", "tokenizer"})
 @CapabilityDescription("Tokenizes the content of a flow file.")
-@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_LIST,
-                                  description = ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION)})
-@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR,
-                                    description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_COUNT,
-                                    description = "The number of tokens found in the flow file."),
-                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST,
-                                    description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_SPANS,
-                                    description = "Holds  the list of token spans found in flow file content, as a JSON span list."),
-                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_PROBABILITIES,
-                                    description = "Holds probabilities for each span prediction from flow file content.")})
+@ReadsAttributes({@ReadsAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_LIST, description = ATTRIBUTE_TAGPOS_TAG_LIST_DESCRIPTION)})
+@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR, description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_COUNT, description = "The number of tokens found in the flow file."),
+                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_LIST, description = ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_TOKENIZE_TOKEN_SPANS, description = "Holds  the list of token spans found in flow file content, as a JSON span list."),
+                   @WritesAttribute(attribute = ATTRIBUTE_NAMEFIND_PROBABILITIES, description = "Holds probabilities for each span prediction from flow file content.")})
 @EqualsAndHashCode(callSuper = true)
 public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
 
-    public static final String ATTRIBUTE_TOKENIZE_TOKEN_COUNT = "nlp.tokenize.token.count";
-
     public static final String ATTRIBUTE_TOKENIZE_TOKEN_LIST = "nlp.tokenize.token.list";
 
-    public static final String ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION = "The list of tokens as found in the content of the flow file.";
+    static final String ATTRIBUTE_TOKENIZE_TOKEN_COUNT = "nlp.tokenize.token.count";
 
-    public static final String ATTRIBUTE_TOKENIZE_TOKEN_SPANS = "nlp.tokenize.token.spans";
+    static final String ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION = "The list of tokens as found in the content of the flow file.";
 
-    public static final PropertyDescriptor PROPERTY_TOKENIZER_TYPE = new PropertyDescriptor.Builder()
+    static final String ATTRIBUTE_TOKENIZE_TOKEN_SPANS = "nlp.tokenize.token.spans";
+
+    static final PropertyDescriptor PROPERTY_TOKENIZER_TYPE = new PropertyDescriptor.Builder()
             .name("Tokenizer type")
             .description("Defines the tokenizer implementation to use, as defined by Apache NLP." +
                          "Most part-of-speech taggers, parsers and so on, work with text tokenized in this manner. " +
@@ -75,9 +66,9 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
             .defaultValue(TokenizerType.SIMPLE.name())
             .build();
 
-    private static Pattern untokenizedParenthesisPattern1 = Pattern.compile("([^ ])([({)}])");
+    private static final Pattern untokenizedParenthesisPattern1 = Pattern.compile("([^ ])([({)}])");
 
-    private static Pattern untokenizedParenthesisPattern2 = Pattern.compile("([({)}])([^ ])");
+    private static final Pattern untokenizedParenthesisPattern2 = Pattern.compile("([({)}])([^ ])");
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(Stream.of(PROPERTY_TOKENIZER_TYPE),
@@ -87,7 +78,7 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
     public Tokenize() {super(TokenizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         final TokenizerType tokenizerType = TokenizerType.valueOf(context.getProperty(PROPERTY_TOKENIZER_TYPE)
                                                                          .evaluateAttributeExpressions()

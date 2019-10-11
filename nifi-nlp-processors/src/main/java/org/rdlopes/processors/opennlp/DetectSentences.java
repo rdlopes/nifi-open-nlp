@@ -14,7 +14,6 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,30 +30,25 @@ import static org.rdlopes.processors.opennlp.DetectSentences.*;
 @NlpProcessor
 @Tags({"apache", "nlp", "sentence", "detection"})
 @CapabilityDescription("Detects the sentences in the content of a flow file.")
-@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR,
-                                    description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_COUNT,
-                                    description = "Holds the sentence chunks count found in the flow file content."),
-                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_LIST,
-                                    description = ATTRIBUTE_SENTDET_CHUNK_LIST_DESCRIPTION),
-                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_SPANS,
-                                    description = "Holds the sentence chunks list found in the flow file content, " +
-                                                  "as a JSON spans list."),
-                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_SENTENCE_PROBABILITIES,
-                                    description = "Holds the probability for each sentence prediction, " +
-                                                  "as a JSON double list.")})
+@WritesAttributes({@WritesAttribute(attribute = ATTRIBUTE_NLP_ERROR, description = ATTRIBUTE_NLP_ERROR_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_COUNT, description = "Holds the sentence chunks count found in the flow file content."),
+                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_LIST, description = ATTRIBUTE_SENTDET_CHUNK_LIST_DESCRIPTION),
+                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_CHUNK_SPANS, description = "Holds the sentence chunks list found in the flow file content, " +
+                                                                                             "as a JSON spans list."),
+                   @WritesAttribute(attribute = ATTRIBUTE_SENTDET_SENTENCE_PROBABILITIES, description = "Holds the probability for each sentence prediction, " +
+                                                                                                        "as a JSON double list.")})
 @EqualsAndHashCode(callSuper = true)
 public class DetectSentences extends AbstractNlpProcessor<SentenceModel> {
 
-    public static final String ATTRIBUTE_SENTDET_CHUNK_COUNT = "nlp.sentdet.chunk.count";
+    static final String ATTRIBUTE_SENTDET_CHUNK_COUNT = "nlp.sentdet.chunk.count";
 
-    public static final String ATTRIBUTE_SENTDET_CHUNK_LIST = "nlp.sentdet.chunk.list";
+    static final String ATTRIBUTE_SENTDET_CHUNK_LIST = "nlp.sentdet.chunk.list";
 
-    public static final String ATTRIBUTE_SENTDET_CHUNK_LIST_DESCRIPTION = "Holds the sentence chunks list found in the flow file content.";
+    static final String ATTRIBUTE_SENTDET_CHUNK_LIST_DESCRIPTION = "Holds the sentence chunks list found in the flow file content.";
 
-    public static final String ATTRIBUTE_SENTDET_CHUNK_SPANS = "nlp.sentdet.chunk.spans";
+    static final String ATTRIBUTE_SENTDET_CHUNK_SPANS = "nlp.sentdet.chunk.spans";
 
-    public static final String ATTRIBUTE_SENTDET_SENTENCE_PROBABILITIES = "nlp.sentdet.sentence.probabilities";
+    static final String ATTRIBUTE_SENTDET_SENTENCE_PROBABILITIES = "nlp.sentdet.sentence.probabilities";
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(Stream.of(PROPERTY_TRAINING_LANGUAGE),
@@ -64,7 +58,7 @@ public class DetectSentences extends AbstractNlpProcessor<SentenceModel> {
     public DetectSentences() {super(SentenceModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, ProcessSession session, String content, Map<String, String> attributes) {
+    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();
         SentenceDetectorME detector = new SentenceDetectorME(getModel());
 
