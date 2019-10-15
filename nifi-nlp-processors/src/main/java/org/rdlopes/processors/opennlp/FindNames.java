@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.namefind.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.Span;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -17,6 +15,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -26,6 +25,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static opennlp.tools.util.Span.spansToStrings;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
 import static org.rdlopes.processors.opennlp.FindNames.*;
@@ -82,13 +82,23 @@ public class FindNames extends AbstractNlpProcessor<TokenNameFinderModel> {
         return evaluation;
     }
 
-    @Override
-    protected TokenNameFinderModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
-        final String nameType = context.getProperty(PROPERTY_NAME_TYPE).evaluateAttributeExpressions().getValue();
+    private TokenNameFinderModel trainModelFrom(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+        final String nameType = validationContext.getProperty(PROPERTY_NAME_TYPE).evaluateAttributeExpressions().getValue();
         TokenNameFinderFactory factory = new TokenNameFinderFactory();
-        try (ObjectStream<NameSample> sampleStream = new NameSampleDataStream(stream)) {
-            return NameFinderME.train(trainingLanguage, nameType, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<NameSample> sampleStream = new NameSampleDataStream(lineStream)) {
+            return NameFinderME.train(trainingLanguage, nameType, sampleStream, trainingParameters, factory);
         }
+    }
+
+    @Override
+    protected TokenNameFinderModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
+        return trainModelFrom(validationContext, trainingParameters, charset, () -> toInputStream(trainingData, charset));
+    }
+
+    @Override
+    protected TokenNameFinderModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
+        return trainModelFrom(validationContext, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 }

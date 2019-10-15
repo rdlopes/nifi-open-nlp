@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.postag.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -16,6 +15,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
@@ -65,12 +66,22 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
         return evaluation;
     }
 
-    @Override
-    protected POSModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+    private POSModel trainModelFrom(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         POSTaggerFactory factory = new POSTaggerFactory();
-        try (ObjectStream<POSSample> sampleStream = new WordTagSampleStream(stream)) {
-            return POSTaggerME.train(trainingLanguage, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<POSSample> sampleStream = new WordTagSampleStream(lineStream)) {
+            return POSTaggerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
+    }
+
+    @Override
+    protected POSModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
+        return trainModelFrom(validationContext, trainingParameters, charset, () -> toInputStream(trainingData, charset));
+    }
+
+    @Override
+    protected POSModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
+        return trainModelFrom(validationContext, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 }

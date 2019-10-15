@@ -25,6 +25,8 @@ public abstract class AbstractNlpProcessorTest {
     @Before
     public void init() {
         testRunner = TestRunners.newTestRunner(processClass);
+        testRunner.setVariable("NIFI_HOME", "target/test-classes");
+        testRunner.setVariable("nlp.model.store.directory", "target/test-classes/store");
     }
 
     @Test

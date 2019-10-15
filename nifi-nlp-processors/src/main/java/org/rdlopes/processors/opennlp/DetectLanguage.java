@@ -3,8 +3,7 @@ package org.rdlopes.processors.opennlp;
 import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import opennlp.tools.langdetect.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -12,11 +11,13 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.processor.ProcessContext;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.rdlopes.processors.opennlp.DetectLanguage.*;
 
 @NlpProcessor
@@ -57,11 +58,22 @@ public class DetectLanguage extends AbstractNlpProcessor<LanguageDetectorModel> 
         return evaluation;
     }
 
-    @Override
-    protected LanguageDetectorModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
+    private LanguageDetectorModel trainModelFrom(TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory)
+            throws IOException {
         LanguageDetectorFactory factory = LanguageDetectorFactory.create(null);
-        try (ObjectStream<LanguageSample> sampleStream = new LanguageDetectorSampleStream(stream)) {
-            return LanguageDetectorME.train(sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<LanguageSample> sampleStream = new LanguageDetectorSampleStream(lineStream)) {
+            return LanguageDetectorME.train(sampleStream, trainingParameters, factory);
         }
+    }
+
+    @Override
+    protected LanguageDetectorModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
+        return trainModelFrom(trainingParameters, charset, () -> toInputStream(trainingData, charset));
+    }
+
+    @Override
+    protected LanguageDetectorModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
+        return trainModelFrom(trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 }
