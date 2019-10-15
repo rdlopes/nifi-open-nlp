@@ -13,12 +13,13 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.context.PropertyContext;
 import org.apache.nifi.processor.ProcessContext;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
 import static org.rdlopes.processors.opennlp.DetectSentences.ATTRIBUTE_SENTDET_CHUNK_LIST;
@@ -118,7 +118,12 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
         return TokenizerType.LEARNABLE == tokenizerType;
     }
 
-    private TokenizerModel trainModelFrom(TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory) throws IOException {
+    @Override
+    protected TokenizerModel trainModel(ValidationContext validationContext,
+                                        Collection<ValidationResult> results,
+                                        TrainingParameters trainingParameters,
+                                        Charset charset,
+                                        InputStreamFactory inputStreamFactory) throws IOException {
         TokenizerFactory factory = new TokenizerFactory();
         try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
              ObjectStream<TokenSample> sampleStream = new TokenSampleStream(lineStream)) {
@@ -126,19 +131,9 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
         }
     }
 
-    @Override
-    protected TokenizerModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
-        return trainModelFrom(trainingParameters, charset, () -> toInputStream(trainingData, charset));
-    }
-
     private String normalizeTokenizedContent(String content) {
         String normalizedContent = untokenizedParenthesisPattern1.matcher(content).replaceAll("$1 $2");
         return untokenizedParenthesisPattern2.matcher(normalizedContent).replaceAll("$1 $2");
-    }
-
-    @Override
-    protected TokenizerModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
-        return trainModelFrom(trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 
     public enum TokenizerType {WHITESPACE, SIMPLE, LEARNABLE}

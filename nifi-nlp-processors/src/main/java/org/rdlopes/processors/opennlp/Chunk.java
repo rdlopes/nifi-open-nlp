@@ -10,18 +10,18 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR;
 import static org.rdlopes.processors.opennlp.AbstractNlpProcessor.ATTRIBUTE_NLP_ERROR_DESCRIPTION;
@@ -76,22 +76,17 @@ public class Chunk extends AbstractNlpProcessor<ChunkerModel> {
         return evaluation;
     }
 
-    private ChunkerModel trainModelFrom(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory) throws IOException {
+    @Override
+    protected ChunkerModel trainModel(ValidationContext validationContext,
+                                      Collection<ValidationResult> results,
+                                      TrainingParameters trainingParameters,
+                                      Charset charset,
+                                      InputStreamFactory inputStreamFactory) throws IOException {
         final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         ChunkerFactory factory = ChunkerFactory.create(null);
         try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
              ObjectStream<ChunkSample> sampleStream = new ChunkSampleStream(lineStream)) {
             return ChunkerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
-    }
-
-    @Override
-    protected ChunkerModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
-        return trainModelFrom(validationContext, trainingParameters, charset, () -> toInputStream(trainingData, charset));
-    }
-
-    @Override
-    protected ChunkerModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
-        return trainModelFrom(validationContext, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 }

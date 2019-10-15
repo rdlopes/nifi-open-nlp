@@ -4,7 +4,10 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.postag.*;
-import opennlp.tools.util.*;
+import opennlp.tools.util.InputStreamFactory;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
+import opennlp.tools.util.TrainingParameters;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -13,18 +16,18 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.rdlopes.processors.opennlp.TagPartOfSpeech.*;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.Tokenize.ATTRIBUTE_TOKENIZE_TOKEN_LIST_DESCRIPTION;
@@ -66,22 +69,17 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
         return evaluation;
     }
 
-    private POSModel trainModelFrom(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, InputStreamFactory inputStreamFactory) throws IOException {
+    @Override
+    protected POSModel trainModel(ValidationContext validationContext,
+                                  Collection<ValidationResult> results,
+                                  TrainingParameters trainingParameters,
+                                  Charset charset,
+                                  InputStreamFactory inputStreamFactory) throws IOException {
         final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         POSTaggerFactory factory = new POSTaggerFactory();
         try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
              ObjectStream<POSSample> sampleStream = new WordTagSampleStream(lineStream)) {
             return POSTaggerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
-    }
-
-    @Override
-    protected POSModel trainModelFromData(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, String trainingData) throws IOException {
-        return trainModelFrom(validationContext, trainingParameters, charset, () -> toInputStream(trainingData, charset));
-    }
-
-    @Override
-    protected POSModel trainModelFromFile(ValidationContext validationContext, TrainingParameters trainingParameters, Charset charset, File dataFile) throws IOException {
-        return trainModelFrom(validationContext, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
     }
 }
