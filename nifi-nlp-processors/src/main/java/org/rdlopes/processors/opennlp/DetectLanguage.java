@@ -45,10 +45,10 @@ public class DetectLanguage extends AbstractNlpProcessor<LanguageDetectorModel> 
     public DetectLanguage() {super(LanguageDetectorModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, LanguageDetectorModel model) {
         // LanguageDetectorME
         Map<String, String> evaluation = new HashMap<>();
-        LanguageDetector languageDetector = new LanguageDetectorME(getModel());
+        LanguageDetector languageDetector = new LanguageDetectorME(model);
         Language predictedLanguage = languageDetector.predictLanguage(content);
         Language[] probableLanguageList = languageDetector.predictLanguages(content);
         String[] supportedLanguages = languageDetector.getSupportedLanguages();

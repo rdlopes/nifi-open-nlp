@@ -66,11 +66,11 @@ public class FindNames extends AbstractNlpProcessor<TokenNameFinderModel> {
     public FindNames() {super(TokenNameFinderModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, TokenNameFinderModel model) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
-        NameFinderME nameFinder = new NameFinderME(getModel());
+        NameFinderME nameFinder = new NameFinderME(model);
         Span[] nameSpans = nameFinder.find(tokensList);
         String[] nameList = spansToStrings(nameSpans, tokensList);
         double[] probabilities = nameFinder.probs();

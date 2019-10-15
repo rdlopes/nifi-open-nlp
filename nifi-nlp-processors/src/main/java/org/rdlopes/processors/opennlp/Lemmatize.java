@@ -102,7 +102,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
     public Lemmatize() {super(LemmatizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, LemmatizerModel model) {
         Map<String, String> evaluation = new HashMap<>();
         final int lemmasSearchCount = context.getProperty(PROPERTY_LEMMAS_SEARCH_COUNT).evaluateAttributeExpressions().asInteger();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
@@ -113,7 +113,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
                                                "(" + tagsList.length + " tags, " + tokensList.length + " tokens).");
         }
 
-        LemmatizerME lemmatizer = new LemmatizerME(getModel());
+        LemmatizerME lemmatizer = new LemmatizerME(model);
         String[] results = lemmatizer.lemmatize(tokensList, tagsList);
         String[][] lemmasPrediction = lemmatizer.predictLemmas(lemmasSearchCount, tokensList, tagsList);
         String[] sesPrediction = lemmatizer.predictSES(tokensList, tagsList);

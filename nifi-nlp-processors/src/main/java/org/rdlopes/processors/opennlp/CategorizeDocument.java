@@ -56,9 +56,9 @@ public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
     public CategorizeDocument() {super(DoccatModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, DoccatModel model) {
         Map<String, String> evaluation = new HashMap<>();
-        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(getModel());
+        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(model);
         String[] splitContent = content.split("\\n");
         double[] results = documentCategorizer.categorize(splitContent);
 

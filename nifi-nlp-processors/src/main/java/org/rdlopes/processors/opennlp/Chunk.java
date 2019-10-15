@@ -59,12 +59,12 @@ public class Chunk extends AbstractNlpProcessor<ChunkerModel> {
     public Chunk() {super(ChunkerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, ChunkerModel model) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
-        ChunkerME chunker = new ChunkerME(getModel());
+        ChunkerME chunker = new ChunkerME(model);
 
         String[] chunks = chunker.chunk(tokensList, tagsList);
         Span[] chunkAsSpans = chunker.chunkAsSpans(tokensList, tagsList);

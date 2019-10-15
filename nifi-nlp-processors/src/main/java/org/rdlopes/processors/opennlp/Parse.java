@@ -134,7 +134,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
     }
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, ParserModel model) {
         Map<String, String> evaluation = new HashMap<>();
 
         int numParses = context.getProperty(PROPERTY_NUM_PARSES)
@@ -148,7 +148,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
                                           .asDouble();
         List<String> tokensList = Arrays.asList(attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST)));
 
-        Parser parser = ParserFactory.create(getModel(), beamSize, advancePercentage);
+        Parser parser = ParserFactory.create(model, beamSize, advancePercentage);
         final opennlp.tools.parser.Parse[] parses = parser.parse(createParseSource(tokensList), numParses);
 
         final List<String> parseCollection = Arrays.stream(parses).map(parse -> {

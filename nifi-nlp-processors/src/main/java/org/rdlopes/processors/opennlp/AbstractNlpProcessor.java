@@ -24,6 +24,7 @@ import org.apache.nifi.processor.Relationship;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.*;
@@ -157,7 +158,6 @@ abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcess
             .name("Training verbose")
             .description("Training parameter (VERBOSE_PARAM).")
             .required(true)
-            .expressionLanguageSupported(VARIABLE_REGISTRY)
             .allowableValues("true", "false")
             .addValidator(BOOLEAN_VALIDATOR)
             .defaultValue(String.valueOf(VERBOSE_DEFAULT))
@@ -175,9 +175,6 @@ abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcess
             PROPERTY_TRAINING_CUTOFF, PROPERTY_TRAINING_ITERATIONS, PROPERTY_TRAINING_ALGORITHM, PROPERTY_TRAINING_VERBOSE, PROPERTY_TRAINING_THREADS, PROPERTY_TRAINING_TYPE,
             PROPERTY_TRAINING_FILE_PATH, PROPERTY_TRAINING_DATA,
             PROPERTY_NLP_MODEL_STORE_PATH);
-
-    @Getter
-    private M model;
 
     AbstractNlpProcessor(Class<M> modelClass) {
         this.modelClass = modelClass;
@@ -203,36 +200,97 @@ abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcess
         trainingParameters.put(VERBOSE_PARAM, validationContext.getProperty(PROPERTY_TRAINING_VERBOSE).asBoolean());
         getLogger().debug("charset: {} | training : {}", new Object[]{charset, trainingParameters});
 
-        boolean modelIsLoaded = validationContext.getProperty(PROPERTY_MODEL_FILE_PATH).isSet();
-        boolean modelIsTrained = validationContext.getProperty(PROPERTY_TRAINING_DATA).isSet() ||
-                                 validationContext.getProperty(PROPERTY_TRAINING_FILE_PATH).isSet();
+        M model = null;
 
-        if (modelIsLoaded && modelIsTrained) {
-            getLogger().warn("Model should be trained and loaded - it will only be loaded");
+        // model is loaded from file
+        if (validationContext.getProperty(PROPERTY_MODEL_FILE_PATH).isSet()) {
+            final String modelFilePath = validationContext.getProperty(PROPERTY_MODEL_FILE_PATH).getValue();
+            getLogger().debug("modelFilePath: {}", new Object[]{modelFilePath});
+            try {
+                model = loadModel(modelFilePath);
+            } catch (Exception e) {
+                getLogger().warn("Loading model failed", e);
+                results.add(new ValidationResult.Builder()
+                                    .valid(false)
+                                    .input(modelFilePath)
+                                    .subject("Loading model failed")
+                                    .explanation(e.getMessage())
+                                    .build());
+            }
+        }
+
+        // train model from training data file, if provided
+        if (validationContext.getProperty(PROPERTY_TRAINING_FILE_PATH).isSet()) {
+            final String trainingFilePath = validationContext.getProperty(PROPERTY_TRAINING_FILE_PATH).getValue();
+            getLogger().debug("trainingFilePath: {}", new Object[]{trainingFilePath});
+            File dataFile = get(trainingFilePath).normalize().toFile();
+            try {
+                model = trainModel(validationContext, results, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
+            } catch (Exception e) {
+                getLogger().warn("Training from file failed", e);
+                results.add(new ValidationResult.Builder()
+                                    .valid(false).input(trainingFilePath)
+                                    .subject("Training from file failed")
+                                    .explanation(e.getMessage()).build());
+            }
+        }
+
+        // train model from training data, if provided
+        if (validationContext.getProperty(PROPERTY_TRAINING_DATA).isSet()) {
+            String trainingData = validationContext.getProperty(PROPERTY_TRAINING_DATA).getValue();
+            getLogger().debug("trainingData: {}", new Object[]{trainingData});
+            try {
+                model = trainModel(validationContext, results, trainingParameters, charset, () -> IOUtils.toInputStream(trainingData, charset));
+            } catch (Exception e) {
+                getLogger().warn("Training from data failed", e);
+                results.add(new ValidationResult.Builder()
+                                    .valid(false).input(trainingData)
+                                    .subject("Training from data failed")
+                                    .explanation(e.getMessage()).build());
+            }
+        }
+
+        boolean modelIsMissing = isTrainingRequired(validationContext) && model == null;
+        if (modelIsMissing) {
             results.add(new ValidationResult.Builder()
                                 .valid(false)
-                                .input("model file path set and (training data or training file set)")
-                                .subject("Priority to model loading")
-                                .explanation("Model should be trained and loaded - it will only be loaded")
+                                .input(String.valueOf(model))
+                                .subject("Training model missing")
+                                .explanation("NLP engine needs training data. Please provide a file or some data.")
                                 .build());
-
-        } else if (modelIsLoaded) {
-            validateModelLoading(validationContext, results);
-        } else if (modelIsTrained) {
-            validateModelTraining(validationContext, results, charset, trainingParameters);
         }
-        validateModelPresence(validationContext, results);
-        if (getModel() != null) {
-            validateModelStoring(validationContext, results);
+
+        if (model != null) {
+            String modelStoreVariable = validationContext.getProperty(PROPERTY_NLP_MODEL_STORE_PATH)
+                                                         .evaluateAttributeExpressions().getValue();
+            getLogger().debug("modelStoreVariable: {}", new Object[]{modelStoreVariable});
+            try {
+                storeModel(model, modelStoreVariable);
+
+            } catch (Exception e) {
+                getLogger().warn("Writing to model store failed", e);
+                results.add(new ValidationResult.Builder()
+                                    .valid(false)
+                                    .input(modelStoreVariable + " + " + getIdentifier() + ".bin")
+                                    .subject("Cannot write to model store")
+                                    .explanation("Error occurred while saving trained model: " + e.getMessage())
+                                    .build());
+            }
         }
 
         return results;
     }
 
-    protected abstract Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes);
+    protected abstract Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, M model);
 
     boolean isTrainingRequired(PropertyContext context) {
         return Optional.ofNullable(context).isPresent();
+    }
+
+    private M loadModel(String modelFilePath) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        getLogger().debug("loading model from: {}", new Object[]{modelFilePath});
+        File modelFile = get(modelFilePath).normalize().toFile();
+        return modelClass.getConstructor(File.class).newInstance(modelFile);
     }
 
     @OnRemoved
@@ -254,14 +312,25 @@ abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcess
     public void onTrigger(ProcessContext context, ProcessSession session) {
         Optional.ofNullable(session.get()).ifPresent(flowFile -> {
             final Charset charset = Charset.forName(context.getProperty(PROPERTY_CHARACTER_SET).evaluateAttributeExpressions().getValue());
+            final String modelStoreVariable = context.getProperty(PROPERTY_NLP_MODEL_STORE_PATH)
+                                                     .evaluateAttributeExpressions().getValue();
+
             AtomicReference<String> flowFileContent = new AtomicReference<>();
             session.read(flowFile, in -> flowFileContent.set(IOUtils.toString(in, charset)));
 
             Map<String, String> attributes = new HashMap<>(flowFile.getAttributes());
             Relationship relationship = RELATIONSHIP_UNMATCHED;
 
+            M model = null;
             try {
-                attributes.putAll(doEvaluate(context, flowFileContent.get(), attributes));
+
+                if (isTrainingRequired(context)) {
+                    final Path modelStorePath = get(modelStoreVariable);
+                    final Path modelFilePath = modelStorePath.resolve(getIdentifier() + ".bin");
+                    model = loadModel(modelFilePath.toString());
+                }
+
+                attributes.putAll(executeModel(context, flowFileContent.get(), attributes, model));
                 relationship = RELATIONSHIP_SUCCESS;
 
             } catch (Exception e) {
@@ -277,95 +346,20 @@ abstract class AbstractNlpProcessor<M extends BaseModel> extends AbstractProcess
         });
     }
 
+    private void storeModel(M model, String modelStoreVariable) throws IOException {
+        Path modelStorePath = get(modelStoreVariable);
+        if (!modelStorePath.toFile().exists()) {
+            createDirectory(modelStorePath);
+        }
+        Path modelFilePath = modelStorePath.resolve(getIdentifier() + ".bin");
+        deleteIfExists(modelFilePath);
+        model.serialize(modelFilePath);
+    }
+
     protected abstract M trainModel(ValidationContext validationContext,
                                     Collection<ValidationResult> results,
                                     TrainingParameters trainingParameters,
                                     Charset charset,
                                     InputStreamFactory inputStreamFactory) throws IOException;
 
-    private void validateModelLoading(ValidationContext validationContext, Collection<ValidationResult> results) {
-        final String modelFilePath = validationContext.getProperty(PROPERTY_MODEL_FILE_PATH).getValue();
-        getLogger().debug("modelFilePath: {}", new Object[]{modelFilePath});
-        try {
-            File modelFile = get(modelFilePath).normalize().toFile();
-            model = modelClass.getConstructor(File.class)
-                              .newInstance(modelFile);
-        } catch (Exception e) {
-            getLogger().warn("Loading model failed", e);
-            results.add(new ValidationResult.Builder()
-                                .valid(false)
-                                .input(modelFilePath)
-                                .subject("Loading model failed")
-                                .explanation(e.getMessage())
-                                .build());
-        }
-    }
-
-    private void validateModelPresence(ValidationContext validationContext, Collection<ValidationResult> results) {
-        boolean modelIsMissing = isTrainingRequired(validationContext) && getModel() == null;
-        if (modelIsMissing) {
-            results.add(new ValidationResult.Builder()
-                                .valid(false)
-                                .input(String.valueOf(getModel()))
-                                .subject("Training model missing")
-                                .explanation("NLP engine needs training data. Please provide a file or some data.")
-                                .build());
-        }
-    }
-
-    private void validateModelStoring(ValidationContext validationContext, Collection<ValidationResult> results) {
-        String modelStoreVariable = validationContext.getProperty(PROPERTY_NLP_MODEL_STORE_PATH)
-                                                     .evaluateAttributeExpressions().getValue();
-        getLogger().debug("modelStoreVariable: {}", new Object[]{modelStoreVariable});
-        try {
-            Path modelStorePath = get(modelStoreVariable);
-            if (!modelStorePath.toFile().exists()) {
-                createDirectory(modelStorePath);
-            }
-            Path modelFilePath = modelStorePath.resolve(getIdentifier() + ".bin");
-            deleteIfExists(modelFilePath);
-            getModel().serialize(modelFilePath);
-
-        } catch (Exception e) {
-            getLogger().warn("Writing to model store failed", e);
-            results.add(new ValidationResult.Builder()
-                                .valid(false)
-                                .input(modelStoreVariable + " + " + getIdentifier() + ".bin")
-                                .subject("Cannot write to model store")
-                                .explanation("Error occurred while saving trained model: " + e.getMessage())
-                                .build());
-        }
-    }
-
-    private void validateModelTraining(ValidationContext validationContext, Collection<ValidationResult> results, Charset charset, TrainingParameters trainingParameters) {
-        // train model from training data file, if provided
-        if (validationContext.getProperty(PROPERTY_TRAINING_FILE_PATH).isSet()) {
-            final String trainingFilePath = validationContext.getProperty(PROPERTY_TRAINING_FILE_PATH).getValue();
-            getLogger().debug("trainingFilePath: {}", new Object[]{trainingFilePath});
-            File dataFile = get(trainingFilePath).normalize().toFile();
-            try {
-                model = trainModel(validationContext, results, trainingParameters, charset, new MarkableFileInputStreamFactory(dataFile));
-            } catch (Exception e) {
-                getLogger().warn("Training from file failed", e);
-                results.add(new ValidationResult.Builder()
-                                    .valid(false).input(trainingFilePath)
-                                    .subject("Training from file failed")
-                                    .explanation(e.getMessage()).build());
-            }
-        }
-        // train model from training data, if provided
-        if (validationContext.getProperty(PROPERTY_TRAINING_DATA).isSet()) {
-            String trainingData = validationContext.getProperty(PROPERTY_TRAINING_DATA).getValue();
-            getLogger().debug("trainingData: {}", new Object[]{trainingData});
-            try {
-                model = trainModel(validationContext, results, trainingParameters, charset, () -> IOUtils.toInputStream(trainingData, charset));
-            } catch (Exception e) {
-                getLogger().warn("Training from data failed", e);
-                results.add(new ValidationResult.Builder()
-                                    .valid(false).input(trainingData)
-                                    .subject("Training from data failed")
-                                    .explanation(e.getMessage()).build());
-            }
-        }
-    }
 }

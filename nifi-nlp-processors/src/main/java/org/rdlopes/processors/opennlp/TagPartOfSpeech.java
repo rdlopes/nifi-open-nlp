@@ -56,9 +56,9 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
     public TagPartOfSpeech() {super(POSModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, POSModel model) {
         Map<String, String> evaluation = new HashMap<>();
-        POSTagger tagger = new POSTaggerME(getModel());
+        POSTagger tagger = new POSTaggerME(model);
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
         String[] tagsList = tagger.tag(tokensList);
