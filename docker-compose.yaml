@@ -20,6 +20,6 @@ services:
         target: /opt/nifi/nifi-current/training
     ports:
       - 8080:8080
-      - 9000:9000
     environment:
       - NIFI_WEB_HTTP_PORT=8080
+      - NIFI_VARIABLE_REGISTRY_PROPERTIES=./conf/nlp.properties

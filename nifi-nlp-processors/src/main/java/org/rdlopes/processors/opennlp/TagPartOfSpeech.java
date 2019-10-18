@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.postag.*;
+import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.TrainingParameters;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
@@ -14,10 +16,12 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +56,9 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
     public TagPartOfSpeech() {super(POSModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, POSModel model) {
         Map<String, String> evaluation = new HashMap<>();
-        POSTagger tagger = new POSTaggerME(getModel());
+        POSTagger tagger = new POSTaggerME(model);
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
         String[] tagsList = tagger.tag(tokensList);
@@ -66,11 +70,16 @@ public class TagPartOfSpeech extends AbstractNlpProcessor<POSModel> {
     }
 
     @Override
-    protected POSModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+    protected POSModel trainModel(ValidationContext validationContext,
+                                  Collection<ValidationResult> results,
+                                  TrainingParameters trainingParameters,
+                                  Charset charset,
+                                  InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         POSTaggerFactory factory = new POSTaggerFactory();
-        try (ObjectStream<POSSample> sampleStream = new WordTagSampleStream(stream)) {
-            return POSTaggerME.train(trainingLanguage, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<POSSample> sampleStream = new WordTagSampleStream(lineStream)) {
+            return POSTaggerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
     }
 }

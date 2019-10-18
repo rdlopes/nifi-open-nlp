@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.doccat.*;
+import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.TrainingParameters;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
@@ -12,14 +14,12 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -56,9 +56,9 @@ public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
     public CategorizeDocument() {super(DoccatModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, DoccatModel model) {
         Map<String, String> evaluation = new HashMap<>();
-        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(getModel());
+        DocumentCategorizer documentCategorizer = new DocumentCategorizerME(model);
         String[] splitContent = content.split("\\n");
         double[] results = documentCategorizer.categorize(splitContent);
 
@@ -78,11 +78,16 @@ public class CategorizeDocument extends AbstractNlpProcessor<DoccatModel> {
     }
 
     @Override
-    protected DoccatModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+    protected DoccatModel trainModel(ValidationContext validationContext,
+                                     Collection<ValidationResult> results,
+                                     TrainingParameters trainingParameters,
+                                     Charset charset,
+                                     InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         DoccatFactory factory = new DoccatFactory(new FeatureGenerator[]{new BagOfWordsFeatureGenerator(), new NGramFeatureGenerator()});
-        try (ObjectStream<DocumentSample> sampleStream = new DocumentSampleStream(stream)) {
-            return DocumentCategorizerME.train(trainingLanguage, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<DocumentSample> sampleStream = new DocumentSampleStream(lineStream)) {
+            return DocumentCategorizerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
     }
 }

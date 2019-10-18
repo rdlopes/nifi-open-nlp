@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.parser.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.Span;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.parser.lang.es.AncoraSpanishHeadRules;
+import opennlp.tools.util.*;
+import opennlp.tools.util.model.ArtifactSerializer;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -15,15 +15,18 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
 import static java.lang.String.join;
+import static java.nio.file.StandardOpenOption.READ;
 import static java.util.stream.Collectors.toList;
 import static opennlp.tools.parser.ParserType.CHUNKING;
 import static opennlp.tools.parser.ParserType.TREEINSERT;
@@ -105,6 +108,13 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
 
     public Parse() {super(ParserModel.class);}
 
+    private HeadRules createHeadRules(String trainingLanguage, String headRulesFilePath) throws IOException {
+        ArtifactSerializer<? extends HeadRules> headRulesSerializer = "es".equals(trainingLanguage) ?
+                                                                      new AncoraSpanishHeadRules.HeadRulesSerializer() :
+                                                                      new opennlp.tools.parser.lang.en.HeadRules.HeadRulesSerializer();
+        return headRulesSerializer.create(Files.newInputStream(Paths.get(headRulesFilePath), READ));
+    }
+
     private opennlp.tools.parser.Parse createParseSource(List<String> tokensList) {
         String aggregatedContent = join(" ", tokensList);
         opennlp.tools.parser.Parse p = new opennlp.tools.parser.Parse(aggregatedContent,
@@ -124,7 +134,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
     }
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, ParserModel model) {
         Map<String, String> evaluation = new HashMap<>();
 
         int numParses = context.getProperty(PROPERTY_NUM_PARSES)
@@ -138,7 +148,7 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
                                           .asDouble();
         List<String> tokensList = Arrays.asList(attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST)));
 
-        Parser parser = ParserFactory.create(getModel(), beamSize, advancePercentage);
+        Parser parser = ParserFactory.create(model, beamSize, advancePercentage);
         final opennlp.tools.parser.Parse[] parses = parser.parse(createParseSource(tokensList), numParses);
 
         final List<String> parseCollection = Arrays.stream(parses).map(parse -> {
@@ -154,14 +164,21 @@ public class Parse extends AbstractNlpProcessor<ParserModel> {
     }
 
     @Override
-    protected ParserModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
-        final ParserType parserType = ParserType.valueOf(context.getProperty(PROPERTY_PARSER_TYPE).getValue());
-        final String headRulesFilePath = context.getProperty(PROPERTY_HEAD_RULES_FILE_PATH).evaluateAttributeExpressions().getValue();
-        final HeadRules rules = new opennlp.tools.parser.lang.en.HeadRules(new InputStreamReader(getClass().getResourceAsStream(headRulesFilePath)));
-        try (ObjectStream<opennlp.tools.parser.Parse> sampleStream = new ParseSampleStream(stream)) {
-            return parserType == TREEINSERT ? opennlp.tools.parser.treeinsert.Parser.train(trainingLanguage, sampleStream, rules, parameters)
-                                            : opennlp.tools.parser.chunking.Parser.train(trainingLanguage, sampleStream, rules, parameters);
+    protected ParserModel trainModel(ValidationContext validationContext,
+                                     Collection<ValidationResult> results,
+                                     TrainingParameters trainingParameters,
+                                     Charset charset,
+                                     InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+        final ParserType parserType = ParserType.valueOf(validationContext.getProperty(PROPERTY_PARSER_TYPE).getValue());
+        final String headRulesFilePath = validationContext.getProperty(PROPERTY_HEAD_RULES_FILE_PATH).evaluateAttributeExpressions().getValue();
+
+        HeadRules headRules = createHeadRules(trainingLanguage, headRulesFilePath);
+
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ParseSampleStream sampleStream = new ParseSampleStream(lineStream)) {
+            return parserType == TREEINSERT ? opennlp.tools.parser.treeinsert.Parser.train(trainingLanguage, sampleStream, headRules, trainingParameters)
+                                            : opennlp.tools.parser.chunking.Parser.train(trainingLanguage, sampleStream, headRules, trainingParameters);
         }
     }
 }

@@ -3,17 +3,21 @@ package org.rdlopes.processors.opennlp;
 import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import opennlp.tools.langdetect.*;
+import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.TrainingParameters;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,10 +45,10 @@ public class DetectLanguage extends AbstractNlpProcessor<LanguageDetectorModel> 
     public DetectLanguage() {super(LanguageDetectorModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, LanguageDetectorModel model) {
         // LanguageDetectorME
         Map<String, String> evaluation = new HashMap<>();
-        LanguageDetector languageDetector = new LanguageDetectorME(getModel());
+        LanguageDetector languageDetector = new LanguageDetectorME(model);
         Language predictedLanguage = languageDetector.predictLanguage(content);
         Language[] probableLanguageList = languageDetector.predictLanguages(content);
         String[] supportedLanguages = languageDetector.getSupportedLanguages();
@@ -58,10 +62,15 @@ public class DetectLanguage extends AbstractNlpProcessor<LanguageDetectorModel> 
     }
 
     @Override
-    protected LanguageDetectorModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
+    protected LanguageDetectorModel trainModel(ValidationContext validationContext,
+                                               Collection<ValidationResult> results,
+                                               TrainingParameters trainingParameters,
+                                               Charset charset,
+                                               InputStreamFactory inputStreamFactory) throws IOException {
         LanguageDetectorFactory factory = LanguageDetectorFactory.create(null);
-        try (ObjectStream<LanguageSample> sampleStream = new LanguageDetectorSampleStream(stream)) {
-            return LanguageDetectorME.train(sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<LanguageSample> sampleStream = new LanguageDetectorSampleStream(lineStream)) {
+            return LanguageDetectorME.train(sampleStream, trainingParameters, factory);
         }
     }
 }

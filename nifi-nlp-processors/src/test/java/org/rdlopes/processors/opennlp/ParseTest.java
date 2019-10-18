@@ -2,9 +2,11 @@ package org.rdlopes.processors.opennlp;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import opennlp.tools.cmdline.parser.ParserTrainerTool;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +22,21 @@ public class ParseTest extends AbstractNlpProcessorTest {
     }
 
     @Test
+    public void apacheOpenNLPShouldWorkAsDocumented() {
+        new ParserTrainerTool().run("opennlp", new String[]{
+                "-model", "target/test-classes/store/en-parser-chunking.bin",
+                "-parserType", "CHUNKING",
+                "-headRules", getClass().getResource("/models/en-head_rules").getFile(),
+                "-lang", "en",
+                "-data", getClass().getResource("/training/parser.train").getFile(),
+                "-encoding", "ISO-8859-1"});
+        assertThat(Paths.get(getClass().getResource("/store/en-parser-chunking.bin").getFile()))
+                .exists();
+    }
+
+    @Test
     public void shouldParseOpenNLPExampleWithSingleParse() {
-        testRunner.setProperty(PROPERTY_MODEL_FILE_PATH, getClass().getResource("/models/en-parser-chunking.bin").getFile());
+        testRunner.setProperty(PROPERTY_TRAINING_FILE_PATH, getClass().getResource("/training/parser.train").getFile());
         testRunner.setProperty(PROPERTY_NUM_PARSES, String.valueOf(3));
         Map<String, String> attributes = new HashMap<>();
         attributes.put(ATTRIBUTE_TOKENIZE_TOKEN_LIST, new Gson().toJson(Arrays.asList(
@@ -44,29 +59,29 @@ public class ParseTest extends AbstractNlpProcessorTest {
         flowFile.assertAttributeExists(ATTRIBUTE_PARSER_PARSE_LIST);
         List<String> parsesList = new Gson().fromJson(flowFile.getAttribute(ATTRIBUTE_PARSER_PARSE_LIST), new TypeToken<List<String>>() {}.getType());
 
-        assertThat(parsesList).containsExactly("(TOP (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) " +
-                                               "(NN board)) (PP (IN as) (NP (DT a) (JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)))))) (VP (VBZ is) " +
-                                               "(NP (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Elsevier) (NNP N) (NNP .) (NNP V) (NNP .)))) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) " +
-                                               "(NN group))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (PP (S (UCP (ADJP (NP (CD 55) (NNS years)) (JJ old)) (CC and) (S (NP (NP (JJ former) " +
-                                               "(NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) (S (NP (NP (DT a) " +
-                                               "(NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))",
-                                               "(TOP (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) " +
-                                               "(NN board)) (SBAR (IN as) (S (NP (DT a) (JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)) (VP (VBZ is) " +
-                                               "(NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) (NNP .) (NNP V) (NNP .)) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) " +
-                                               "(NN group))))))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (SBAR (S (UCP (ADJP (NP (CD 55) (NNS years)) (JJ old)) (CC and) (S (NP (NP " +
-                                               "(JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) (S (NP " +
-                                               "(NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))",
-                                               "(TOP (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) " +
-                                               "(NN board)) (PP (IN as) (NP (DT a) (JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)))))) (VP (VBZ is) " +
-                                               "(NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) (NNP .) (NNP V) (NNP .)) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) " +
-                                               "(NN group))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (SBAR (S (UCP (ADJP (NP (CD 55) (NNS years)) (JJ old)) (CC and) (S" +
-                                               " (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) " +
-                                               "(S (NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))");
+        assertThat(parsesList).containsExactly(
+                "(TOP (S (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (NP (CD 61) (NNS years) (VBD old))) (, ,) (VP (MD will) (PP (IN join) (NP (DT the) (NN board))) (PP (IN as) (NP (DT a) (NN" +
+                " nonexecutive) (NN director))) (NP (NNP Nov)))) (. .) (NP (NP (CD 29)) (. .) (NP (NNP Mr))) (. .) ('' Vinken) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Elsevier) " +
+                "(NNP N))) (. .) (NP (PRP V))))) (. .) (, ,) (NP (DT the) (NNP Dutch) (NN publishing) (NN group)) (. .) (VP (-RRB- Rudolph) (NP (NNP Agnew)))) (, ,) (NP (CD 55) (NNS years)) (VP " +
+                "(VBD old) (CC and) (VP (PP (S (PP (IN former) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC))))) (, ,) (VP (VBD was) (VP (VBN named) " +
+                "(NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (NNP British) (NN industrial) (NN conglomerate)))))))))) (. .)))",
+
+                "(TOP (S (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (NP (CD 61) (NNS years) (VBD old))) (, ,) (VP (MD will) (VP (IN join) (NP (DT the) (NN board)) (PP (IN as) (NP (DT a) (NN " +
+                "nonexecutive) (NN director))) (NP (NNP Nov))))) (. .) (NP (NP (CD 29)) (. .) (NP (NNP Mr))) (. .) ('' Vinken) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Elsevier) " +
+                "(NNP N))) (. .) (NP (PRP V))))) (. .) (, ,) (NP (DT the) (NNP Dutch) (NN publishing) (NN group)) (. .) (VP (-RRB- Rudolph) (NP (NNP Agnew)))) (, ,) (NP (CD 55) (NNS years)) (VP " +
+                "(VBD old) (CC and) (VP (PP (S (PP (IN former) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC))))) (, ,) (VP (VBD was) (VP (VBN named) " +
+                "(NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (NNP British) (NN industrial) (NN conglomerate)))))))))) (. .)))",
+
+                "(TOP (S (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (NP (CD 61) (NNS years) (VBD old))) (, ,) (VP (MD will) (PP (IN join) (NP (DT the) (NN board))) (PP (IN as) (NP (DT a) (NN" +
+                " nonexecutive) (NN director))) (NP (NNP Nov)))) (. .) (NP (NP (CD 29)) (. .) (NP (NNP Mr))) (. .) ('' Vinken) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Elsevier) " +
+                "(NNP N))) (. .) (NP (PRP V))))) (. .) (, ,) (NP (DT the) (NNP Dutch) (NN publishing) (NN group)) (. .) (VP (-RRB- Rudolph) (NP (NNP Agnew)))) (, ,) (NP (CD 55) (NNS years)) (VP " +
+                "(VBD old) (CC and) (PP (S (PP (IN former) (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC))))) (, ,) (VP (VBD was) (VP (VBN named) (NP " +
+                "(NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (NNP British) (NN industrial) (NN conglomerate))))))))) (. .)))");
     }
 
     @Test
     public void shouldParseTimesheetQuestionWithSingleParse() {
-        testRunner.setProperty(PROPERTY_MODEL_FILE_PATH, getClass().getResource("/models/en-parser-chunking.bin").getFile());
+        testRunner.setProperty(PROPERTY_TRAINING_FILE_PATH, getClass().getResource("/training/parser.train").getFile());
         testRunner.setProperty(PROPERTY_NUM_PARSES, String.valueOf(1));
         Map<String, String> attributes = new HashMap<>();
         attributes.put(ATTRIBUTE_TOKENIZE_TOKEN_LIST, new Gson().toJson(Arrays.asList("did", "I", "report", "my", "time", "correctly", "?")));
@@ -81,12 +96,12 @@ public class ParseTest extends AbstractNlpProcessorTest {
         flowFile.assertAttributeExists(ATTRIBUTE_PARSER_PARSE_LIST);
         List<String> parsesList = new Gson().fromJson(flowFile.getAttribute(ATTRIBUTE_PARSER_PARSE_LIST), new TypeToken<List<String>>() {}.getType());
 
-        assertThat(parsesList).containsExactly("(TOP (SQ (VBD did) (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly))) (. ?)))");
+        assertThat(parsesList).containsExactly("(TOP (S (VBD did) (VP (NP (PRP I)) (NP (RB report) (JJ my) (NN time) (NN correctly))) (. ?)))");
     }
 
     @Test
     public void shouldParseTimesheetQuestionWithTenParses() {
-        testRunner.setProperty(PROPERTY_MODEL_FILE_PATH, getClass().getResource("/models/en-parser-chunking.bin").getFile());
+        testRunner.setProperty(PROPERTY_TRAINING_FILE_PATH, getClass().getResource("/training/parser.train").getFile());
         testRunner.setProperty(PROPERTY_NUM_PARSES, String.valueOf(10));
         Map<String, String> attributes = new HashMap<>();
         attributes.put(ATTRIBUTE_TOKENIZE_TOKEN_LIST, new Gson().toJson(Arrays.asList("did", "I", "report", "my", "time", "correctly", "?")));
@@ -102,21 +117,21 @@ public class ParseTest extends AbstractNlpProcessorTest {
         List<String> parsesList = new Gson().fromJson(flowFile.getAttribute(ATTRIBUTE_PARSER_PARSE_LIST), new TypeToken<List<String>>() {}.getType());
 
         assertThat(parsesList).containsExactly(
-                "(TOP (VP (SQ (VBD did) (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time)))) (PP (ADVP (RB correctly))) (. ?)))",
-                "(TOP (VP (VBD did) (PP (SBAR (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly)))))) (. ?)))",
-                "(TOP (VP (VBD did) (PP (SBAR (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly)))))) (. ?)))",
-                "(TOP (VP (SQ (VBD did) (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time)))) (ADVP (RB correctly)) (. ?)))",
-                "(TOP (VP (VBD did) (PP (SBAR (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly)))))) (. ?)))",
-                "(TOP (VP (VBD did) (ADVP (NP (PRP I)) (SBAR (S (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly)))))) (. ?)))",
-                "(TOP (S (S (VP (VBD did))) (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time)))) (ADVP (RB correctly)) (. ?)))",
-                "(TOP (VP (VBD did) (SBAR (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time)) (ADVP (RB correctly))))) (. ?)))",
-                "(TOP (VP (VBD did) (SBAR (S (NP (PRP I)) (VP (VB report) (NP (PRP$ my) (NN time) (RB correctly))))) (. ?)))",
-                "(TOP (SQ (VBD did) (NP (PRP I)) (VP (VB report) (FRAG (NP (PRP$ my) (NN time)) (PP (ADVP (RB correctly))))) (. ?)))");
+                "(TOP (S (VBD did) (PP (VP (PRP I) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))",
+                "(TOP (S (NN did) (PP (VP (PRP I) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))",
+                "(TOP (S (NN did) (PP (VP (PRP I) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))",
+                "(TOP (S (VBD did) (PP (VP (NP (PRP I)) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))",
+                "(TOP (S (VBD did) (PP (VP (NP (PRP I)) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))",
+                "(TOP (S (NN did) (PP (VP (PRP I) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (, ?)))",
+                "(TOP (S (NN did) (PP (VP (PRP I) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (, ?)))",
+                "(TOP (S (VBD did) (PP (VP (NP (PRP I)) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (, ?)))",
+                "(TOP (S (VBD did) (PP (VP (NP (PRP I)) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (, ?)))",
+                "(TOP (S (VBD did) (VP (NP (NP (PRP I)) (RB report) (NP (JJ my) (NN time) (NN correctly)))) (. ?)))");
     }
 
     @Test
     public void shouldProduceNoResultWithoutInput() {
-        testRunner.setProperty(PROPERTY_MODEL_FILE_PATH, getClass().getResource("/models/en-parser-chunking.bin").getFile());
+        testRunner.setProperty(PROPERTY_TRAINING_FILE_PATH, getClass().getResource("/training/parser.train").getFile());
         testRunner.enqueue();
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

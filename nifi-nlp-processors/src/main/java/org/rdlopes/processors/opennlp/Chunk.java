@@ -4,18 +4,18 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.chunker.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.Span;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.*;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +59,12 @@ public class Chunk extends AbstractNlpProcessor<ChunkerModel> {
     public Chunk() {super(ChunkerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, ChunkerModel model) {
         Map<String, String> evaluation = new HashMap<>();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
         String[] tokensList = attributeAsStringArray(attributes.get(ATTRIBUTE_TOKENIZE_TOKEN_LIST));
 
-        ChunkerME chunker = new ChunkerME(getModel());
+        ChunkerME chunker = new ChunkerME(model);
 
         String[] chunks = chunker.chunk(tokensList, tagsList);
         Span[] chunkAsSpans = chunker.chunkAsSpans(tokensList, tagsList);
@@ -77,12 +77,16 @@ public class Chunk extends AbstractNlpProcessor<ChunkerModel> {
     }
 
     @Override
-    protected ChunkerModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+    protected ChunkerModel trainModel(ValidationContext validationContext,
+                                      Collection<ValidationResult> results,
+                                      TrainingParameters trainingParameters,
+                                      Charset charset,
+                                      InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         ChunkerFactory factory = ChunkerFactory.create(null);
-        try (ObjectStream<ChunkSample> sampleStream = new ChunkSampleStream(stream)) {
-            return ChunkerME.train(trainingLanguage, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<ChunkSample> sampleStream = new ChunkSampleStream(lineStream)) {
+            return ChunkerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
     }
-
 }

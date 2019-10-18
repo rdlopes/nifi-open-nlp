@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.lemmatizer.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.Sequence;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -15,10 +13,12 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +102,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
     public Lemmatize() {super(LemmatizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, LemmatizerModel model) {
         Map<String, String> evaluation = new HashMap<>();
         final int lemmasSearchCount = context.getProperty(PROPERTY_LEMMAS_SEARCH_COUNT).evaluateAttributeExpressions().asInteger();
         String[] tagsList = attributeAsStringArray(attributes.get(ATTRIBUTE_TAGPOS_TAG_LIST));
@@ -113,7 +113,7 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
                                                "(" + tagsList.length + " tags, " + tokensList.length + " tokens).");
         }
 
-        LemmatizerME lemmatizer = new LemmatizerME(getModel());
+        LemmatizerME lemmatizer = new LemmatizerME(model);
         String[] results = lemmatizer.lemmatize(tokensList, tagsList);
         String[][] lemmasPrediction = lemmatizer.predictLemmas(lemmasSearchCount, tokensList, tagsList);
         String[] sesPrediction = lemmatizer.predictSES(tokensList, tagsList);
@@ -143,11 +143,16 @@ public class Lemmatize extends AbstractNlpProcessor<LemmatizerModel> {
     }
 
     @Override
-    protected LemmatizerModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        final String trainingLanguage = context.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
+    protected LemmatizerModel trainModel(ValidationContext validationContext,
+                                         Collection<ValidationResult> results,
+                                         TrainingParameters trainingParameters,
+                                         Charset charset,
+                                         InputStreamFactory inputStreamFactory) throws IOException {
+        final String trainingLanguage = validationContext.getProperty(PROPERTY_TRAINING_LANGUAGE).evaluateAttributeExpressions().getValue();
         LemmatizerFactory factory = new LemmatizerFactory();
-        try (ObjectStream<LemmaSample> sampleStream = new LemmaSampleStream(stream)) {
-            return LemmatizerME.train(trainingLanguage, sampleStream, parameters, factory);
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<LemmaSample> sampleStream = new LemmaSampleStream(lineStream)) {
+            return LemmatizerME.train(trainingLanguage, sampleStream, trainingParameters, factory);
         }
     }
 }

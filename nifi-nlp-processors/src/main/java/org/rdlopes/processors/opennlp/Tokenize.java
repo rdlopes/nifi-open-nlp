@@ -4,9 +4,7 @@ import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.tokenize.*;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.Span;
-import opennlp.tools.util.TrainingParameters;
+import opennlp.tools.util.*;
 import org.apache.nifi.annotation.behavior.ReadsAttribute;
 import org.apache.nifi.annotation.behavior.ReadsAttributes;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
@@ -15,11 +13,13 @@ import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
+import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.context.PropertyContext;
 import org.apache.nifi.processor.ProcessContext;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
 import static org.apache.nifi.processor.util.StandardValidators.NON_BLANK_VALIDATOR;
 import static org.rdlopes.processors.opennlp.DetectSentences.ATTRIBUTE_SENTDET_CHUNK_LIST;
 import static org.rdlopes.processors.opennlp.FindNames.ATTRIBUTE_NAMEFIND_PROBABILITIES;
@@ -60,7 +59,6 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
                          "Most part-of-speech taggers, parsers and so on, work with text tokenized in this manner. " +
                          "It is important to ensure that your tokenizer produces tokens of the type expected by your later text processing components.")
             .required(true)
-            .expressionLanguageSupported(VARIABLE_REGISTRY)
             .allowableValues(TokenizerType.values())
             .addValidator(NON_BLANK_VALIDATOR)
             .defaultValue(TokenizerType.SIMPLE.name())
@@ -78,10 +76,9 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
     public Tokenize() {super(TokenizerModel.class);}
 
     @Override
-    protected Map<String, String> doEvaluate(ProcessContext context, String content, Map<String, String> attributes) {
+    protected Map<String, String> executeModel(ProcessContext context, String content, Map<String, String> attributes, TokenizerModel model) {
         Map<String, String> evaluation = new HashMap<>();
         final TokenizerType tokenizerType = TokenizerType.valueOf(context.getProperty(PROPERTY_TOKENIZER_TYPE)
-                                                                         .evaluateAttributeExpressions()
                                                                          .getValue());
 
         Tokenizer tokenizer;
@@ -93,7 +90,7 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
                 tokenizer = SimpleTokenizer.INSTANCE;
                 break;
             case LEARNABLE:
-                tokenizer = new TokenizerME(getModel());
+                tokenizer = new TokenizerME(model);
                 break;
             default:
                 throw new IllegalArgumentException("tokenizer type cannot be null");
@@ -111,19 +108,23 @@ public class Tokenize extends AbstractNlpProcessor<TokenizerModel> {
     }
 
     @Override
-    protected TokenizerModel doTrain(ValidationContext context, TrainingParameters parameters, Charset charset, ObjectStream<String> stream) throws IOException {
-        TokenizerFactory factory = new TokenizerFactory();
-        try (ObjectStream<TokenSample> sampleStream = new TokenSampleStream(stream)) {
-            return TokenizerME.train(sampleStream, factory, parameters);
-        }
+    protected boolean isTrainingRequired(PropertyContext context) {
+        final TokenizerType tokenizerType = TokenizerType.valueOf(context.getProperty(PROPERTY_TOKENIZER_TYPE)
+                                                                         .getValue());
+        return TokenizerType.LEARNABLE == tokenizerType;
     }
 
     @Override
-    protected boolean isTrainingRequired(PropertyContext context) {
-        final TokenizerType tokenizerType = TokenizerType.valueOf(context.getProperty(PROPERTY_TOKENIZER_TYPE)
-                                                                         .evaluateAttributeExpressions()
-                                                                         .getValue());
-        return TokenizerType.LEARNABLE == tokenizerType;
+    protected TokenizerModel trainModel(ValidationContext validationContext,
+                                        Collection<ValidationResult> results,
+                                        TrainingParameters trainingParameters,
+                                        Charset charset,
+                                        InputStreamFactory inputStreamFactory) throws IOException {
+        TokenizerFactory factory = new TokenizerFactory();
+        try (ObjectStream<String> lineStream = new PlainTextByLineStream(inputStreamFactory, charset);
+             ObjectStream<TokenSample> sampleStream = new TokenSampleStream(lineStream)) {
+            return TokenizerME.train(sampleStream, factory, trainingParameters);
+        }
     }
 
     private String normalizeTokenizedContent(String content) {
