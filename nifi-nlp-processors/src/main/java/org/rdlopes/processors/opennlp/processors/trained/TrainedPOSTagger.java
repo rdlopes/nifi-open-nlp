@@ -1,12 +1,14 @@
 package org.rdlopes.processors.opennlp.processors.trained;
 
 import opennlp.tools.postag.POSModel;
-import opennlp.tools.postag.POSTagger;
+import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 import org.rdlopes.processors.opennlp.wrappers.POSTaggerWrapper;
 
-public class TrainedPOSTagger extends AbstractPreTrainedProcessor<POSTagger, POSModel> {
+public class TrainedPOSTagger extends AbstractPreTrainedProcessor<POSModel> {
 
-    public TrainedPOSTagger() {
-        super(new POSTaggerWrapper());
+    @Override
+    protected NLPToolWrapper<POSModel> createWrapper(ProcessorInitializationContext context) {
+        return new POSTaggerWrapper();
     }
 }

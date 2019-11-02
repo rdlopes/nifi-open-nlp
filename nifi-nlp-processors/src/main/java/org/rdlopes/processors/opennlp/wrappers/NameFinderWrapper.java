@@ -14,7 +14,7 @@ import static opennlp.tools.util.Span.spansToStrings;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.NAMEFIND_NAME_TYPE;
 
-public class NameFinderWrapper extends NLPToolWrapper<TokenNameFinder, TokenNameFinderModel> {
+public class NameFinderWrapper extends NLPToolWrapper<TokenNameFinderModel> {
 
     public NameFinderWrapper() {
         super(TokenNameFinderModel.class);

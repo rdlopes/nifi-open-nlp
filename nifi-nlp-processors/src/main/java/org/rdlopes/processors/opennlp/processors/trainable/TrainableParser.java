@@ -1,9 +1,11 @@
 package org.rdlopes.processors.opennlp.processors.trainable;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import opennlp.tools.parser.Parser;
 import opennlp.tools.parser.ParserModel;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 import org.rdlopes.processors.opennlp.wrappers.ParserWrapper;
 
 import java.util.List;
@@ -12,7 +14,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
-public class TrainableParser extends AbstractTrainableProcessor<Parser, ParserModel> {
+@EqualsAndHashCode(callSuper = true)
+public class TrainableParser extends AbstractTrainableProcessor<ParserModel> {
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(super.getSupportedPropertyDescriptors().stream(),
@@ -24,6 +27,11 @@ public class TrainableParser extends AbstractTrainableProcessor<Parser, ParserMo
                                                                                 .collect(toList());
 
     public TrainableParser() {
-        super(new ParserWrapper(), true);
+        super(true);
+    }
+
+    @Override
+    protected NLPToolWrapper<ParserModel> createWrapper(ProcessorInitializationContext context) {
+        return new ParserWrapper();
     }
 }

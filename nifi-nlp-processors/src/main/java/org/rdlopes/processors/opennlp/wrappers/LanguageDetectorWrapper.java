@@ -14,7 +14,7 @@ import java.util.Map;
 
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 
-public class LanguageDetectorWrapper extends NLPToolWrapper<LanguageDetector, LanguageDetectorModel> {
+public class LanguageDetectorWrapper extends NLPToolWrapper<LanguageDetectorModel> {
 
     public LanguageDetectorWrapper() {
         super(LanguageDetectorModel.class);

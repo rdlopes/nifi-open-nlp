@@ -5,7 +5,7 @@ import org.rdlopes.processors.opennlp.processors.AbstractNLPProcessorTest;
 
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
-public abstract class AbstractTrainableProcessorTest<P extends AbstractTrainableProcessor<?, ?>> extends AbstractNLPProcessorTest<P> {
+public abstract class AbstractTrainableProcessorTest<P extends AbstractTrainableProcessor<?>> extends AbstractNLPProcessorTest<P> {
 
     protected static String[] SAMPLE_TAGS_AGREEMENT = {"NNP", "VBD", "DT", "NN", "VBZ", "IN", "PRP", "TO", "VB",
                                                        "CD", "JJ", "JJ", "NNS", "IN", "DT", "NNS", "."};

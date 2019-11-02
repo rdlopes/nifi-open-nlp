@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-public class SentenceDetectorWrapper extends NLPToolWrapper<SentenceDetector, SentenceModel> {
+public class SentenceDetectorWrapper extends NLPToolWrapper<SentenceModel> {
 
     public SentenceDetectorWrapper() {
         super(SentenceModel.class);

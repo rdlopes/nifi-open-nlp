@@ -25,7 +25,7 @@ import static org.rdlopes.processors.opennlp.common.NLPAttribute.PARSER_PARSE_LI
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
-public class ParserWrapper extends NLPToolWrapper<Parser, ParserModel> {
+public class ParserWrapper extends NLPToolWrapper<ParserModel> {
 
     public ParserWrapper() {
         super(ParserModel.class);

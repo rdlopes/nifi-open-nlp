@@ -12,15 +12,24 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
-public abstract class NLPToolWrapper<T, M extends BaseModel> {
+public abstract class NLPToolWrapper<M extends BaseModel> {
 
     @Getter
     private final Class<M> modelClass;
 
     protected NLPToolWrapper(Class<M> modelClass) {this.modelClass = modelClass;}
+
+    public void deleteModel(Path modelFile) {
+        try {
+            Files.deleteIfExists(modelFile);
+        } catch (IOException e) {
+            throw new ProcessException("Deleting model from " + modelFile + " failed", e);
+        }
+    }
 
     public abstract void evaluateContent(ProcessContext context, M model, String content, Map<String, String> attributes);
 

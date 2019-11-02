@@ -13,6 +13,8 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.PropertyValue;
 import org.apache.nifi.context.PropertyContext;
 
+import java.nio.charset.Charset;
+
 import static opennlp.tools.ml.AbstractTrainer.VERBOSE_DEFAULT;
 import static opennlp.tools.parser.ParserType.CHUNKING;
 import static org.apache.nifi.expression.ExpressionLanguageScope.VARIABLE_REGISTRY;
@@ -196,6 +198,10 @@ public enum NLPProperty {
 
     NLPProperty(PropertyDescriptor descriptor) {
         this.descriptor = descriptor;
+    }
+
+    public Charset getCharsetFrom(PropertyContext propertyContext) {
+        return Charset.forName(getStringFrom(propertyContext));
     }
 
     public double getDoubleFrom(PropertyContext propertyContext) {

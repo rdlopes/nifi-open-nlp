@@ -12,7 +12,6 @@ import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.apache.nifi.context.PropertyContext;
 import org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor;
-import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,7 +31,7 @@ import static opennlp.tools.util.TrainingParameters.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractTrainableProcessor<T, M extends BaseModel> extends AbstractNLPProcessor<T, M> {
+public abstract class AbstractTrainableProcessor<M extends BaseModel> extends AbstractNLPProcessor<M> {
 
     protected final boolean modelRequired;
 
@@ -49,8 +48,7 @@ public abstract class AbstractTrainableProcessor<T, M extends BaseModel> extends
                                                                                                   TRAINABLE_TRAINING_DATA.descriptor))
                                                                                 .collect(toList());
 
-    protected AbstractTrainableProcessor(NLPToolWrapper<T, M> toolWrapper, boolean modelRequired) {
-        super(toolWrapper);
+    public AbstractTrainableProcessor(boolean modelRequired) {
         this.modelRequired = modelRequired;
     }
 
@@ -62,7 +60,7 @@ public abstract class AbstractTrainableProcessor<T, M extends BaseModel> extends
                       String sourceName,
                       InputStreamFactory inputStreamFactory) {
         try {
-            return getWrapper().trainModel(validationContext, trainingLanguage, charset, trainingParameters, inputStreamFactory);
+            return getToolWrapper().trainModel(validationContext, trainingLanguage, charset, trainingParameters, inputStreamFactory);
         } catch (Exception e) {
             getLogger().warn("Training from " + sourceName + " failed", e);
             results.add(new ValidationResult.Builder()

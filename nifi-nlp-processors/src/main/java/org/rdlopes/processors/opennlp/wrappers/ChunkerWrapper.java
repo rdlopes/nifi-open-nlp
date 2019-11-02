@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 
-public class ChunkerWrapper extends NLPToolWrapper<Chunker, ChunkerModel> {
+public class ChunkerWrapper extends NLPToolWrapper<ChunkerModel> {
 
     public ChunkerWrapper() {
         super(ChunkerModel.class);

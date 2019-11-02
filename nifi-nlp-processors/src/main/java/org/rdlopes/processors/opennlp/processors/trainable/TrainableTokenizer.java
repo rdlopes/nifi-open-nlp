@@ -1,9 +1,11 @@
 package org.rdlopes.processors.opennlp.processors.trainable;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerModel;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 import org.rdlopes.processors.opennlp.wrappers.TokenizerWrapper;
 
 import java.util.List;
@@ -12,7 +14,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 
-public class TrainableTokenizer extends AbstractTrainableProcessor<Tokenizer, TokenizerModel> {
+@EqualsAndHashCode(callSuper = true)
+public class TrainableTokenizer extends AbstractTrainableProcessor<TokenizerModel> {
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(super.getSupportedPropertyDescriptors().stream(),
@@ -20,6 +23,11 @@ public class TrainableTokenizer extends AbstractTrainableProcessor<Tokenizer, To
                                                                                 .collect(toList());
 
     public TrainableTokenizer() {
-        super(new TokenizerWrapper(), true);
+        super(true);
+    }
+
+    @Override
+    protected NLPToolWrapper<TokenizerModel> createWrapper(ProcessorInitializationContext context) {
+        return new TokenizerWrapper();
     }
 }

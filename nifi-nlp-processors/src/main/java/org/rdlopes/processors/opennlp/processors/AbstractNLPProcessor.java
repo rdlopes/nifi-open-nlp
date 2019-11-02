@@ -7,13 +7,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.nifi.annotation.behavior.EventDriven;
 import org.apache.nifi.annotation.behavior.InputRequirement;
 import org.apache.nifi.annotation.behavior.SupportsBatching;
+import org.apache.nifi.annotation.lifecycle.OnRemoved;
+import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
-import org.apache.nifi.processor.AbstractProcessor;
-import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.Relationship;
+import org.apache.nifi.processor.*;
 import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ import static org.rdlopes.processors.opennlp.common.NLPProperty.COMMON_MODELS_ST
 @SupportsBatching
 @InputRequirement(INPUT_REQUIRED)
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractNLPProcessor<T, M extends BaseModel> extends AbstractProcessor {
+public abstract class AbstractNLPProcessor<M extends BaseModel> extends AbstractProcessor {
 
     public static final Relationship RELATIONSHIP_SUCCESS = new Relationship.Builder()
             .name("success")
@@ -55,11 +54,9 @@ public abstract class AbstractNLPProcessor<T, M extends BaseModel> extends Abstr
             Arrays.asList(COMMON_CHARACTER_SET.descriptor, COMMON_MODELS_STORAGE_DIRECTORY.descriptor);
 
     @Getter
-    private final NLPToolWrapper<T, M> wrapper;
+    private NLPToolWrapper<M> toolWrapper;
 
-    protected AbstractNLPProcessor(NLPToolWrapper<T, M> wrapper) {
-        this.wrapper = wrapper;
-    }
+    protected abstract NLPToolWrapper<M> createWrapper(ProcessorInitializationContext context);
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
@@ -85,6 +82,31 @@ public abstract class AbstractNLPProcessor<T, M extends BaseModel> extends Abstr
     }
 
     @Override
+    protected void init(ProcessorInitializationContext context) {
+        this.toolWrapper = createWrapper(context);
+    }
+
+    @OnRemoved
+    public void onRemoved(ProcessContext context) {
+        getLogger().info("Processor removed with context: {}", new Object[]{context});
+        String storageDirectory = COMMON_MODELS_STORAGE_DIRECTORY.getStringFrom(context);
+
+        try {
+            Path modelStorePath = get(storageDirectory);
+            Path modelFilePath = modelStorePath.resolve(getIdentifier() + ".bin");
+            toolWrapper.deleteModel(modelFilePath);
+
+        } catch (Exception e) {
+            getLogger().error("Deleting model file failed", e);
+        }
+    }
+
+    @OnScheduled
+    public void onScheduled(ProcessContext context) {
+        getLogger().info("Processor scheduled with context: {}", new Object[]{context});
+    }
+
+    @Override
     public void onTrigger(ProcessContext context, ProcessSession session) {
         Optional.ofNullable(session.get())
                 .ifPresent(flowFile -> {
@@ -101,9 +123,9 @@ public abstract class AbstractNLPProcessor<T, M extends BaseModel> extends Abstr
                         final Path storagePath = get(modelsStorageDirectory);
                         final Path filePath = storagePath.resolve(getIdentifier() + ".bin");
 
-                        M model = wrapper.loadModel(filePath);
+                        M model = toolWrapper.loadModel(filePath);
                         Map<String, String> attributes = new HashMap<>(flowFile.getAttributes());
-                        wrapper.evaluateContent(context, model, flowFileContent.get(), attributes);
+                        toolWrapper.evaluateContent(context, model, flowFileContent.get(), attributes);
 
                         flowFile = session.putAllAttributes(flowFile, attributes);
                         relationship = RELATIONSHIP_SUCCESS;

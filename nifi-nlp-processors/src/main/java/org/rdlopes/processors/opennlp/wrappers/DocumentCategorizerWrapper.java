@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 
-public class DocumentCategorizerWrapper extends NLPToolWrapper<DocumentCategorizer, DoccatModel> {
+public class DocumentCategorizerWrapper extends NLPToolWrapper<DoccatModel> {
 
     public DocumentCategorizerWrapper() {
         super(DoccatModel.class);

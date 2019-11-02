@@ -5,7 +5,7 @@ import org.rdlopes.processors.opennlp.processors.AbstractNLPProcessorTest;
 
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 
-public abstract class AbstractPreTrainedProcessorTest<P extends AbstractPreTrainedProcessor<?, ?>> extends AbstractNLPProcessorTest<P> {
+public abstract class AbstractPreTrainedProcessorTest<P extends AbstractPreTrainedProcessor<?>> extends AbstractNLPProcessorTest<P> {
 
     public AbstractPreTrainedProcessorTest(Class<P> processorClass) {
         super(processorClass);

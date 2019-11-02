@@ -15,7 +15,7 @@ import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_L
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 
-public class TokenizerWrapper extends NLPToolWrapper<Tokenizer, TokenizerModel> {
+public class TokenizerWrapper extends NLPToolWrapper<TokenizerModel> {
 
     private static final Pattern untokenizedParenthesisPattern1 = Pattern.compile("([^ ])([({)}])");
 

@@ -14,7 +14,7 @@ import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_SEARCH_COUNT;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_TOPK_MINIMUM_SCORE;
 
-public class LemmatizerWrapper extends NLPToolWrapper<Lemmatizer, LemmatizerModel> {
+public class LemmatizerWrapper extends NLPToolWrapper<LemmatizerModel> {
 
     public LemmatizerWrapper() {
         super(LemmatizerModel.class);

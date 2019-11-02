@@ -1,12 +1,14 @@
 package org.rdlopes.processors.opennlp.processors.trained;
 
-import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceModel;
+import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 import org.rdlopes.processors.opennlp.wrappers.SentenceDetectorWrapper;
 
-public class TrainedSentenceDetector extends AbstractPreTrainedProcessor<SentenceDetector, SentenceModel> {
+public class TrainedSentenceDetector extends AbstractPreTrainedProcessor<SentenceModel> {
 
-    public TrainedSentenceDetector() {
-        super(new SentenceDetectorWrapper());
+    @Override
+    protected NLPToolWrapper<SentenceModel> createWrapper(ProcessorInitializationContext context) {
+        return new SentenceDetectorWrapper();
     }
 }

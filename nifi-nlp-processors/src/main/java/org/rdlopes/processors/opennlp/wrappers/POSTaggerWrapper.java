@@ -16,7 +16,7 @@ import java.util.Map;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
 
-public class POSTaggerWrapper extends NLPToolWrapper<POSTagger, POSModel> {
+public class POSTaggerWrapper extends NLPToolWrapper<POSModel> {
 
     public POSTaggerWrapper() {
         super(POSModel.class);

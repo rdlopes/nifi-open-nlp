@@ -1,9 +1,11 @@
 package org.rdlopes.processors.opennlp.processors.trainable;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import opennlp.tools.namefind.TokenNameFinder;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
 import org.rdlopes.processors.opennlp.wrappers.NameFinderWrapper;
 
 import java.util.List;
@@ -12,7 +14,8 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.NAMEFIND_NAME_TYPE;
 
-public class TrainableNameFinder extends AbstractTrainableProcessor<TokenNameFinder, TokenNameFinderModel> {
+@EqualsAndHashCode(callSuper = true)
+public class TrainableNameFinder extends AbstractTrainableProcessor<TokenNameFinderModel> {
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(super.getSupportedPropertyDescriptors().stream(),
@@ -20,6 +23,11 @@ public class TrainableNameFinder extends AbstractTrainableProcessor<TokenNameFin
                                                                                 .collect(toList());
 
     public TrainableNameFinder() {
-        super(new NameFinderWrapper(), true);
+        super(true);
+    }
+
+    @Override
+    protected NLPToolWrapper<TokenNameFinderModel> createWrapper(ProcessorInitializationContext context) {
+        return new NameFinderWrapper();
     }
 }

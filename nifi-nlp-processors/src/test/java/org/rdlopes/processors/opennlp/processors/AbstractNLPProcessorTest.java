@@ -4,7 +4,7 @@ import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.Before;
 
-public abstract class AbstractNLPProcessorTest<P extends AbstractNLPProcessor<?, ?>> {
+public abstract class AbstractNLPProcessorTest<P extends AbstractNLPProcessor<?>> {
     protected static String SAMPLE_CONTENT_VINKEN = "Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                                                     "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
                                                     "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +
