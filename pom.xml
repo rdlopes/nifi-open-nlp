@@ -71,7 +71,6 @@
                 <groupId>org.apache.nifi</groupId>
                 <artifactId>nifi-utils</artifactId>
                 <version>${nifi.version}</version>
-                <type>war</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
