@@ -16,7 +16,6 @@ import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
-import org.apache.nifi.processor.exception.ProcessException;
 import org.rdlopes.processors.opennlp.tools.NLPTool;
 
 import java.nio.charset.Charset;
@@ -130,7 +129,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
     }
 
     @Override
-    public void onTrigger(ProcessContext processContext, ProcessSession processSession) throws ProcessException {
+    public void onTrigger(ProcessContext processContext, ProcessSession processSession) {
         FlowFile flowFile = Optional.ofNullable(processSession.get())
                                     .orElseGet(processSession::create);
         final ConcurrentMap<String, String> attributes = new ConcurrentHashMap<>(flowFile.getAttributes());
