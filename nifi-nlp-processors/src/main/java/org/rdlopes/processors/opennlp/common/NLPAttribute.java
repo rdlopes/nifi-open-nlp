@@ -44,9 +44,9 @@ public enum NLPAttribute {
 
     PARSER_PARSE_LIST("nlp.parser.parse.list", "Holds the list of parses found in flow file content.");
 
-    public final String description;
+    private final String description;
 
-    public final Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     public final String key;
 

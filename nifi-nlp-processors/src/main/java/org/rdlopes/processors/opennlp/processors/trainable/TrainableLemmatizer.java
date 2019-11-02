@@ -4,10 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.lemmatizer.LemmatizerModel;
 import org.apache.nifi.components.PropertyDescriptor;
-import org.apache.nifi.processor.ProcessorInitializationContext;
-import org.rdlopes.processors.opennlp.wrappers.LemmatizerWrapper;
-import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
+import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.tools.LemmatizerTool;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +16,7 @@ import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_SEARCH
 import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_TOPK_MINIMUM_SCORE;
 
 @EqualsAndHashCode(callSuper = true)
-public class TrainableLemmatizer extends AbstractTrainableProcessor<LemmatizerModel> {
+public class TrainableLemmatizer extends NLPProcessor<LemmatizerModel, LemmatizerTool> {
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(super.getSupportedPropertyDescriptors().stream(),
@@ -29,7 +29,7 @@ public class TrainableLemmatizer extends AbstractTrainableProcessor<LemmatizerMo
     }
 
     @Override
-    protected NLPToolWrapper<LemmatizerModel> createWrapper(ProcessorInitializationContext context) {
-        return new LemmatizerWrapper();
+    protected LemmatizerTool createTool(Path modelPath) {
+        return new LemmatizerTool(modelPath, getLogger());
     }
 }

@@ -4,10 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.parser.ParserModel;
 import org.apache.nifi.components.PropertyDescriptor;
-import org.apache.nifi.processor.ProcessorInitializationContext;
-import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
-import org.rdlopes.processors.opennlp.wrappers.ParserWrapper;
+import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.tools.ParserTool;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
 @EqualsAndHashCode(callSuper = true)
-public class TrainableParser extends AbstractTrainableProcessor<ParserModel> {
+public class TrainableParser extends NLPProcessor<ParserModel, ParserTool> {
 
     @Getter
     private final List<PropertyDescriptor> supportedPropertyDescriptors = Stream.concat(super.getSupportedPropertyDescriptors().stream(),
@@ -31,7 +31,7 @@ public class TrainableParser extends AbstractTrainableProcessor<ParserModel> {
     }
 
     @Override
-    protected NLPToolWrapper<ParserModel> createWrapper(ProcessorInitializationContext context) {
-        return new ParserWrapper();
+    protected ParserTool createTool(Path modelPath) {
+        return new ParserTool(modelPath, getLogger());
     }
 }

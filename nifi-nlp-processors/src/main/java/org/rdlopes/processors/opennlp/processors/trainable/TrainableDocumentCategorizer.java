@@ -1,18 +1,19 @@
 package org.rdlopes.processors.opennlp.processors.trainable;
 
 import opennlp.tools.doccat.DoccatModel;
-import org.apache.nifi.processor.ProcessorInitializationContext;
-import org.rdlopes.processors.opennlp.wrappers.DocumentCategorizerWrapper;
-import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
+import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.tools.DocumentCategorizerTool;
 
-public class TrainableDocumentCategorizer extends AbstractTrainableProcessor<DoccatModel> {
+import java.nio.file.Path;
+
+public class TrainableDocumentCategorizer extends NLPProcessor<DoccatModel, DocumentCategorizerTool> {
 
     public TrainableDocumentCategorizer() {
         super(true);
     }
 
     @Override
-    protected NLPToolWrapper<DoccatModel> createWrapper(ProcessorInitializationContext context) {
-        return new DocumentCategorizerWrapper();
+    protected DocumentCategorizerTool createTool(Path modelPath) {
+        return new DocumentCategorizerTool(modelPath, getLogger());
     }
 }

@@ -10,10 +10,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_SUCCESS;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_UNMATCHED;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
-public class TrainableTokenizerTest extends AbstractTrainableProcessorTest<TrainableTokenizer> {
+public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableTokenizer> {
 
     public TrainableTokenizerTest() {
         super(TrainableTokenizer.class);

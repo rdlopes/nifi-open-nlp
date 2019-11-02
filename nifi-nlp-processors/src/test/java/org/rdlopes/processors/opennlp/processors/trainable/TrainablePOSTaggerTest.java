@@ -13,10 +13,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_SUCCESS;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_UNMATCHED;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
-public class TrainablePOSTaggerTest extends AbstractTrainableProcessorTest<TrainablePOSTagger> {
+public class TrainablePOSTaggerTest extends TrainableProcessorTest<TrainablePOSTagger> {
 
     public TrainablePOSTaggerTest() {
         super(TrainablePOSTagger.class);

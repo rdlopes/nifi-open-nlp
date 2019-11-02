@@ -9,10 +9,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_SUCCESS;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_UNMATCHED;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
-public class TrainableSentenceDetectorTest extends AbstractTrainableProcessorTest<TrainableSentenceDetector> {
+public class TrainableSentenceDetectorTest extends TrainableProcessorTest<TrainableSentenceDetector> {
 
     public TrainableSentenceDetectorTest() {
         super(TrainableSentenceDetector.class);
@@ -24,7 +24,10 @@ public class TrainableSentenceDetectorTest extends AbstractTrainableProcessorTes
         setTrainingParamIterations(100);
         setTrainingParamCutoff(0);
 
-        testRunner.enqueue(SAMPLE_CONTENT_VINKEN);
+        testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
+                           "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
+                           "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +
+                           "    a director of this British industrial conglomerate .");
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);

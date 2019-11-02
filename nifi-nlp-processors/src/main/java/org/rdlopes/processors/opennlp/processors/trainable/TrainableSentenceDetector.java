@@ -1,18 +1,19 @@
 package org.rdlopes.processors.opennlp.processors.trainable;
 
 import opennlp.tools.sentdetect.SentenceModel;
-import org.apache.nifi.processor.ProcessorInitializationContext;
-import org.rdlopes.processors.opennlp.wrappers.NLPToolWrapper;
-import org.rdlopes.processors.opennlp.wrappers.SentenceDetectorWrapper;
+import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.tools.SentenceDetectorTool;
 
-public class TrainableSentenceDetector extends AbstractTrainableProcessor<SentenceModel> {
+import java.nio.file.Path;
+
+public class TrainableSentenceDetector extends NLPProcessor<SentenceModel, SentenceDetectorTool> {
 
     public TrainableSentenceDetector() {
         super(true);
     }
 
     @Override
-    protected NLPToolWrapper<SentenceModel> createWrapper(ProcessorInitializationContext context) {
-        return new SentenceDetectorWrapper();
+    protected SentenceDetectorTool createTool(Path modelPath) {
+        return new SentenceDetectorTool(modelPath, getLogger());
     }
 }

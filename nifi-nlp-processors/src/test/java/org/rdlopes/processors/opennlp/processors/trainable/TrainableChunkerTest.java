@@ -11,10 +11,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_SUCCESS;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_UNMATCHED;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
-public class TrainableChunkerTest extends AbstractTrainableProcessorTest<TrainableChunker> {
+public class TrainableChunkerTest extends TrainableProcessorTest<TrainableChunker> {
 
     public TrainableChunkerTest() {
         super(TrainableChunker.class);
@@ -24,8 +24,10 @@ public class TrainableChunkerTest extends AbstractTrainableProcessorTest<Trainab
     public void shouldChunk() {
         setTrainingFilePath("/training/en-chunker.train");
         Map<String, String> attributes = new HashMap<>();
-        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, SAMPLE_TAGS_AGREEMENT);
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_AGREEMENT);
+        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, new String[]{
+                "NNP", "VBD", "DT", "NN", "VBZ", "IN", "PRP", "TO", "VB", "CD", "JJ", "JJ", "NNS", "IN", "DT", "NNS", "."});
+        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, new String[]{
+                "Rockwell", "said", "the", "agreement", "calls", "for", "it", "to", "supply", "200", "additional", "so-called", "shipsets", "for", "the", "planes", "."});
         testRunner.enqueue("", attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

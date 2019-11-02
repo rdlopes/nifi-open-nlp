@@ -14,10 +14,10 @@ import static java.util.Collections.singletonList;
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_SUCCESS;
-import static org.rdlopes.processors.opennlp.processors.AbstractNLPProcessor.RELATIONSHIP_UNMATCHED;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
+import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
-public class TrainableDocumentCategorizerTest extends AbstractTrainableProcessorTest<TrainableDocumentCategorizer> {
+public class TrainableDocumentCategorizerTest extends TrainableProcessorTest<TrainableDocumentCategorizer> {
 
     public TrainableDocumentCategorizerTest() {
         super(TrainableDocumentCategorizer.class);
