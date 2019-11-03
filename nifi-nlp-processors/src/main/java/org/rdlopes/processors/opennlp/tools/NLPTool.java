@@ -21,6 +21,7 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.*;
 import static java.nio.file.Paths.get;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.io.IOUtils.toInputStream;
 import static org.apache.nifi.util.StringUtils.isBlank;
 
@@ -43,11 +44,16 @@ public abstract class NLPTool<M extends BaseModel> {
 
     public void createModelFromPreTrained(Path preTrainedPath) throws IOException {
         getLogger().debug("createModelFromPreTrained | source:{} | target:{}", new Object[]{preTrainedPath, modelPath});
+
         if (!modelPath.getParent().toFile().exists()) {
             createDirectory(modelPath.getParent());
         }
-        deleteIfExists(modelPath);
-        copy(preTrainedPath, modelPath);
+
+        if (modelPath.toFile().exists()) {
+            copy(preTrainedPath, modelPath, REPLACE_EXISTING);
+        } else {
+            copy(preTrainedPath, modelPath);
+        }
     }
 
     public void createModelFromTraining(ValidationContext validationContext,
@@ -74,9 +80,6 @@ public abstract class NLPTool<M extends BaseModel> {
             deleteIfExists(modelPath);
             getLogger().info("Storing model {} at {}", new Object[]{model, modelPath});
             model.serialize(modelPath);
-
-        } else {
-            throw new ProcessException("Trainable processor requires training data");
         }
     }
 

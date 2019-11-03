@@ -18,6 +18,7 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
 import org.rdlopes.processors.opennlp.tools.NLPTool;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.*;
@@ -80,6 +81,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         final String storagePath = COMMON_MODELS_STORAGE_DIRECTORY.getStringFrom(validationContext);
         final Path modelPath = get(storagePath).resolve(getIdentifier() + ".bin");
         this.nlp = createTool(modelPath);
+        this.nlp.removeModel();
 
         if (trainable) {
             validateTraining(validationContext, results);
@@ -116,6 +118,10 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
                      .collect(toList());
     }
 
+    protected Map<String, String> evaluateContent(ProcessContext processContext, InputStream in, Charset charset, ConcurrentMap<String, String> attributes) {
+        return nlp.processContent(processContext, in, charset, attributes);
+    }
+
     @OnRemoved
     public void onRemoved(ProcessContext context) {
         getLogger().info("Processor removed with context: {}", new Object[]{context});
@@ -137,7 +143,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         Relationship relationship = RELATIONSHIP_UNMATCHED;
 
         try {
-            processSession.read(flowFile, in -> attributes.putAll(nlp.processContent(processContext, in, charset, attributes)));
+            processSession.read(flowFile, in -> attributes.putAll(evaluateContent(processContext, in, charset, attributes)));
             flowFile = processSession.putAllAttributes(flowFile, attributes);
             relationship = RELATIONSHIP_SUCCESS;
             getLogger().debug("onTrigger | flow file content evaluated: {}", new Object[]{attributes});
@@ -154,7 +160,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         }
     }
 
-    private void validatePreTrainedModel(ValidationContext validationContext, Collection<ValidationResult> results) {
+    protected void validatePreTrainedModel(ValidationContext validationContext, Collection<ValidationResult> results) {
         final Path trainedModelPath = get(TRAINED_MODEL_FILE_PATH.getStringFrom(validationContext));
         try {
             nlp.createModelFromPreTrained(trainedModelPath);
@@ -169,18 +175,27 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
 
     private void validateTraining(ValidationContext validationContext, Collection<ValidationResult> results) {
         final String trainingLanguage = TRAINABLE_TRAINING_LANGUAGE.getStringFrom(validationContext);
-        final String trainingFilePath = TRAINABLE_TRAINING_FILE_PATH.getStringFrom(validationContext);
-        final String trainingData = TRAINABLE_TRAINING_DATA.getStringFrom(validationContext);
         final TrainingParameters trainingParameters = createTrainingParameters(validationContext);
 
-        try {
-            nlp.createModelFromTraining(validationContext, trainingParameters, trainingLanguage, trainingFilePath, trainingData);
-        } catch (Exception e) {
-            getLogger().warn("training validation error", e);
+        if (!TRAINABLE_TRAINING_FILE_PATH.isSetIn(validationContext) && !TRAINABLE_TRAINING_DATA.isSetIn(validationContext)) {
+            getLogger().warn("missing training data");
             results.add(new ValidationResult.Builder()
-                                .input(String.format("language:%s;file:%s;data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
-                                .subject("training").explanation(e.getMessage())
+                                .input("file:null;data:null").valid(false)
+                                .subject("training").explanation("Trainable processor requires training data or training file")
                                 .build());
+
+        } else {
+            final String trainingFilePath = TRAINABLE_TRAINING_FILE_PATH.getStringFrom(validationContext);
+            final String trainingData = TRAINABLE_TRAINING_DATA.getStringFrom(validationContext);
+            try {
+                nlp.createModelFromTraining(validationContext, trainingParameters, trainingLanguage, trainingFilePath, trainingData);
+            } catch (Exception e) {
+                getLogger().warn("training validation error", e);
+                results.add(new ValidationResult.Builder()
+                                    .input(String.format("language:%s;file:%s;data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
+                                    .subject("training").explanation(e.getMessage())
+                                    .build());
+            }
         }
     }
 
