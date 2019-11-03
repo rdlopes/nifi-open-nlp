@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.apache.nifi</groupId>
         <artifactId>nifi-nar-bundles</artifactId>
-        <version>1.8.0</version>
+        <version>1.9.2</version>
     </parent>
 
     <groupId>org.rdlopes</groupId>
@@ -20,6 +20,7 @@
     </modules>
 
     <properties>
+        <nifi.version>1.9.2</nifi.version>
         <opennlp.version>1.9.1</opennlp.version>
         <lombok.version>1.18.10</lombok.version>
         <commons-io.version>2.6</commons-io.version>
@@ -60,7 +61,11 @@
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.nifi</groupId>
+                <artifactId>nifi-utils</artifactId>
+                <version>${nifi.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
-
 </project>

@@ -1,7 +1,7 @@
 FROM maven:3.5.2-jdk-8-alpine AS MAVEN_TOOL_CHAIN
 COPY . /tmp/
 WORKDIR /tmp/
-RUN mvn clean package -DskipTests
+RUN mvn -B clean package -DskipTests
 
 FROM apache/nifi:latest
 COPY --from=MAVEN_TOOL_CHAIN /tmp/nifi-nlp-nar/target/nifi-nlp-nar.nar lib/nifi-nlp-nar.nar
