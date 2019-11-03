@@ -10,6 +10,7 @@ import java.util.List;
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -21,10 +22,11 @@ public class TrainableLanguageDetectorTest extends TrainableProcessorTest<Traina
 
     @Test
     public void shouldDetectPortuguese() {
-        setTrainingFilePath("/training/en-langdet.train");
-        setTrainingParamAlgorithm(NAIVE_BAYES_VALUE);
-        setTrainingParamCutoff(0);
-        setTrainingParamIterations(100);
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-langdet.train").getFile());
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, NAIVE_BAYES_VALUE);
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
+        testRunner.assertValid();
 
         testRunner.enqueue("estava em uma marcenaria na Rua Bruno");
         testRunner.run();

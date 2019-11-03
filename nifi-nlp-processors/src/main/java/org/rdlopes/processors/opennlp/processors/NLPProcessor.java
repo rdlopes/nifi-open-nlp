@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import static java.nio.file.Paths.get;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static opennlp.tools.ml.AbstractTrainer.VERBOSE_PARAM;
@@ -75,13 +76,16 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
 
     @Override
     protected Collection<ValidationResult> customValidate(ValidationContext validationContext) {
-        Collection<ValidationResult> results = new ArrayList<>(super.customValidate(validationContext));
-
         final String storagePath = COMMON_MODELS_STORAGE_DIRECTORY.getStringFrom(validationContext);
         final Path modelPath = get(storagePath).resolve(getIdentifier() + ".bin");
-        this.nlp = createTool(modelPath);
-        this.nlp.removeModel();
+        getLogger().debug("customValidate | modelPath:{}", new Object[]{modelPath});
+        this.nlp = Optional.ofNullable(this.nlp).orElseGet(() -> createTool(modelPath));
 
+        if (this.nlp.modelExists()) {
+            return emptyList();
+        }
+
+        Collection<ValidationResult> results = new ArrayList<>(super.customValidate(validationContext));
         if (trainable) {
             validateTraining(validationContext, results);
         } else {
@@ -90,6 +94,14 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
 
         getLogger().debug("customValidate | results:{}", new Object[]{results});
         return results;
+    }
+
+    @Override
+    public void onPropertyModified(final PropertyDescriptor descriptor, final String oldValue, final String newValue) {
+        getLogger().debug("onPropertyModified | descriptor: {} | old: {} | new: {}", new Object[]{descriptor, oldValue, newValue});
+        Optional.ofNullable(this.nlp)
+                .filter(NLPTool::modelExists)
+                .ifPresent(NLPTool::removeModel);
     }
 
     @Override

@@ -7,6 +7,7 @@ org.rdlopes.processors.opennlp.processors.trainable.TrainableParser
 org.rdlopes.processors.opennlp.processors.trainable.TrainablePOSTagger
 org.rdlopes.processors.opennlp.processors.trainable.TrainableSentenceDetector
 org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer
+org.rdlopes.processors.opennlp.processors.trained.PreConfiguredTokenizer
 org.rdlopes.processors.opennlp.processors.trained.PreTrainedChunker
 org.rdlopes.processors.opennlp.processors.trained.PreTrainedLanguageDetector
 org.rdlopes.processors.opennlp.processors.trained.PreTrainedLemmatizer

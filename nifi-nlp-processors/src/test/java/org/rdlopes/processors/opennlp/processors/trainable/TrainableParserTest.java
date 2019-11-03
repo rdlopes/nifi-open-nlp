@@ -12,6 +12,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.PARSER_PARSE_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.PARSER_HEAD_RULES_FILE_PATH;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINABLE_TRAINING_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -23,8 +25,9 @@ public class TrainableParserTest extends TrainableProcessorTest<TrainableParser>
 
     @Test
     public void shouldParse() {
-        setTrainingFilePath("/training/en-parser.train");
-        setHeadRulesFilePath("/training/en_head_rules");
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-parser.train").getFile());
+        testRunner.setProperty(PARSER_HEAD_RULES_FILE_PATH.descriptor, getClass().getResource("/training/en_head_rules").getFile());
+        testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
         TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, Arrays.asList(

@@ -164,6 +164,11 @@
     </logger>
 
 
+    <logger name="org.rdlopes" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APP_FILE"/>
+    </logger>
+
     <root level="INFO">
         <appender-ref ref="APP_FILE"/>
     </root>

@@ -44,12 +44,9 @@ public abstract class NLPTool<M extends BaseModel> {
 
     public void createModelFromPreTrained(Path preTrainedPath) throws IOException {
         getLogger().debug("createModelFromPreTrained | source:{} | target:{}", new Object[]{preTrainedPath, modelPath});
+        ensureModelDirectoryExists();
 
-        if (!modelPath.getParent().toFile().exists()) {
-            createDirectory(modelPath.getParent());
-        }
-
-        if (modelPath.toFile().exists()) {
+        if (modelExists()) {
             copy(preTrainedPath, modelPath, REPLACE_EXISTING);
         } else {
             copy(preTrainedPath, modelPath);
@@ -74,16 +71,24 @@ public abstract class NLPTool<M extends BaseModel> {
         }
 
         if (model != null) {
-            if (!modelPath.getParent().toFile().exists()) {
-                createDirectory(modelPath.getParent());
-            }
-            deleteIfExists(modelPath);
             getLogger().info("Storing model {} at {}", new Object[]{model, modelPath});
+            ensureModelDirectoryExists();
+            deleteIfExists(modelPath);
             model.serialize(modelPath);
         }
     }
 
+    private void ensureModelDirectoryExists() throws IOException {
+        if (!modelPath.getParent().toFile().exists()) {
+            createDirectory(modelPath.getParent());
+        }
+    }
+
     protected abstract void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, M model, Map<String, String> evaluation) throws IOException;
+
+    public boolean modelExists() {
+        return modelPath.toFile().exists();
+    }
 
     public Map<String, String> processContent(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes) {
         Map<String, String> evaluation = new HashMap<>();

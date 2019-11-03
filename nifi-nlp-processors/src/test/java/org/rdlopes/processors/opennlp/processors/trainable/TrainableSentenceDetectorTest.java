@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -20,9 +21,10 @@ public class TrainableSentenceDetectorTest extends TrainableProcessorTest<Traina
 
     @Test
     public void shouldDetectSentenceFromTimesheetQuestion() {
-        setTrainingFilePath("/training/en-sentdet.train");
-        setTrainingParamIterations(100);
-        setTrainingParamCutoff(0);
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-sentdet.train").getFile());
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
+        testRunner.assertValid();
 
         testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                            "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +

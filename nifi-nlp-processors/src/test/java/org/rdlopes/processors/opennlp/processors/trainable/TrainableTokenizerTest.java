@@ -10,6 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINABLE_TRAINING_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -21,7 +22,9 @@ public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableToke
 
     @Test
     public void shouldTokenize() {
-        setTrainingFilePath("/training/en-token.train");
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-token.train").getFile());
+        testRunner.assertValid();
+
         testRunner.enqueue("Sounds like it's not properly thought through!");
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
@@ -35,17 +38,11 @@ public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableToke
         List<String> tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
         List<Span> tokenSpans = TOKENIZE_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
-        assertThat(tokensList).containsExactly("Sounds", "like", "it", "'", "s", "not", "properly", "thought", "through", "!");
-        assertThat(tokenSpans).containsExactly(new Span(0, 6, null),
-                                               new Span(7, 11, null),
-                                               new Span(12, 14, null),
-                                               new Span(14, 15, null),
-                                               new Span(15, 16, null),
-                                               new Span(17, 20, null),
-                                               new Span(21, 29, null),
-                                               new Span(30, 37, null),
-                                               new Span(38, 45, null),
-                                               new Span(45, 46, null));
+        assertThat(tokensList).containsExactly("Sounds", "like", "it", "'s", "not", "properly", "thought", "through", "!");
+        assertThat(tokenSpans).containsExactly(
+                new Span(0, 6, null), new Span(7, 11, null), new Span(12, 14, null), new Span(14, 16, null), new Span(17, 20, null),
+                new Span(21, 29, null), new Span(30, 37, null), new Span(38, 45, null), new Span(45, 46, null)
+        );
     }
 
 }

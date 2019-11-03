@@ -63,6 +63,7 @@ public enum NLPProperty {
                                          .name("Training data file path")
                                          .description("Path to the training file containing data to train the model.")
                                          .required(false)
+                                         .expressionLanguageSupported(VARIABLE_REGISTRY)
                                          .addValidator(NON_BLANK_VALIDATOR)
                                          .build()),
     TRAINABLE_TRAINING_PARAM_ALGORITHM(new PropertyDescriptor.Builder()

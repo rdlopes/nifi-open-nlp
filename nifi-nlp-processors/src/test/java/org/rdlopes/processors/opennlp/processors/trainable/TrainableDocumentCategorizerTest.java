@@ -14,6 +14,7 @@ import static java.util.Collections.singletonList;
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -25,11 +26,14 @@ public class TrainableDocumentCategorizerTest extends TrainableProcessorTest<Tra
 
     @Test
     public void shouldCategorizeTweets() {
-        setTrainingFilePath("/training/en-doccat.train");
-        setTrainingParamAlgorithm(NAIVE_BAYES_VALUE);
-        setTrainingParamCutoff(0);
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-doccat.train").getFile());
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, NAIVE_BAYES_VALUE);
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
+        testRunner.assertValid();
+
         Map<String, String> attributes = new HashMap<>();
         SENTDET_CHUNK_LIST.updateAttributesWithJson(attributes, singletonList("Have a nice day!"));
+
         testRunner.enqueue("", attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

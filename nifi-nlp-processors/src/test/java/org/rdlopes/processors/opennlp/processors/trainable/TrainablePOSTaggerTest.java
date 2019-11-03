@@ -13,6 +13,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -24,10 +25,11 @@ public class TrainablePOSTaggerTest extends TrainableProcessorTest<TrainablePOST
 
     @Test
     public void shouldTagPOS() {
-        setTrainingFilePath("/training/en-tagpos.train");
-        setTrainingParamAlgorithm(GISTrainer.MAXENT_VALUE);
-        setTrainingParamIterations(100);
-        setTrainingParamCutoff(5);
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-tagpos.train").getFile());
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, GISTrainer.MAXENT_VALUE);
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(5));
+        testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
         TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, Arrays.asList("The", "driver", "got", "badly", "injured", "."));

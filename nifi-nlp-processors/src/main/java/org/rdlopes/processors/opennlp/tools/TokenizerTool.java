@@ -21,7 +21,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
-import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 
 public class TokenizerTool extends NLPTool<TokenizerModel> {
     private static final Pattern untokenizedParenthesisPattern1 = Pattern.compile("([^ ])([({)}])");
@@ -36,7 +35,7 @@ public class TokenizerTool extends NLPTool<TokenizerModel> {
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, TokenizerModel model, Map<String, String> evaluation)
             throws IOException {
 
-        Tokenizer tokenizer = null;
+        Tokenizer tokenizer;
         if (TOKENIZE_TOKENIZER_TYPE.isSetIn(processContext)) {
             switch (TOKENIZE_TOKENIZER_TYPE.getEnumFrom(processContext, TokenizerType.class)) {
                 case WHITESPACE:
@@ -49,7 +48,8 @@ public class TokenizerTool extends NLPTool<TokenizerModel> {
                     tokenizer = new TokenizerME(model);
                     break;
             }
-        } else if (TRAINED_MODEL_FILE_PATH.isSetIn(processContext)) {
+
+        } else {
             tokenizer = new TokenizerME(model);
         }
 

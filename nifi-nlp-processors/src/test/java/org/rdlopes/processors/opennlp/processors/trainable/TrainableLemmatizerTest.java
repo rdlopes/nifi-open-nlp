@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -22,9 +23,9 @@ public class TrainableLemmatizerTest extends TrainableProcessorTest<TrainableLem
 
     @Test
     public void shouldLemmatizeOpenNLPExample() {
-        setTrainingFilePath("/training/en-lemma.train");
-        setTrainingParamCutoff(5);
-        setTrainingParamIterations(100);
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-lemma.train").getFile());
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(5));
+        testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
