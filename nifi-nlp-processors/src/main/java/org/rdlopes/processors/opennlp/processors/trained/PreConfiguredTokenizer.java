@@ -6,17 +6,12 @@ import opennlp.tools.tokenize.TokenizerModel;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
-import org.apache.nifi.processor.ProcessContext;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
 import org.rdlopes.processors.opennlp.tools.TokenizerTool;
 
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -39,11 +34,6 @@ public class PreConfiguredTokenizer extends NLPProcessor<TokenizerModel, Tokeniz
     @Override
     protected TokenizerTool createTool(Path modelPath) {
         return new TokenizerTool(modelPath, getLogger());
-    }
-
-    @Override
-    protected Map<String, String> evaluateContent(ProcessContext processContext, InputStream in, Charset charset, ConcurrentMap<String, String> attributes) {
-        return super.evaluateContent(processContext, in, charset, attributes);
     }
 
     @Override

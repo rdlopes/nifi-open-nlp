@@ -18,7 +18,6 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
 import org.rdlopes.processors.opennlp.tools.NLPTool;
 
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.*;
@@ -118,10 +117,6 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
                      .collect(toList());
     }
 
-    protected Map<String, String> evaluateContent(ProcessContext processContext, InputStream in, Charset charset, ConcurrentMap<String, String> attributes) {
-        return nlp.processContent(processContext, in, charset, attributes);
-    }
-
     @OnRemoved
     public void onRemoved(ProcessContext context) {
         getLogger().info("Processor removed with context: {}", new Object[]{context});
@@ -143,7 +138,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         Relationship relationship = RELATIONSHIP_UNMATCHED;
 
         try {
-            processSession.read(flowFile, in -> attributes.putAll(evaluateContent(processContext, in, charset, attributes)));
+            processSession.read(flowFile, in -> attributes.putAll(nlp.processContent(processContext, in, charset, attributes)));
             flowFile = processSession.putAllAttributes(flowFile, attributes);
             relationship = RELATIONSHIP_SUCCESS;
             getLogger().debug("onTrigger | flow file content evaluated: {}", new Object[]{attributes});
