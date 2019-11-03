@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TAGPOS_TAG_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -22,7 +23,7 @@ public class PreTrainedPOSTaggerTest extends PreTrainedProcessorTest<PreTrainedP
 
     @Test
     public void shouldTagPartOfSpeech() {
-        setModelFilePath("/models/en-pos-maxent.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-pos-maxent.bin").getFile());
         Map<String, String> attributes = new HashMap<>();
         TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, new String[]{
                 "Pierre", "Vinken", ",", "61", "years", "old", ",", "will", "join", "the", "board", "as", "a", "nonexecutive", "director", "Nov", ".", "29", ".", "Mr", ".", "Vinken", "is", "chairman",

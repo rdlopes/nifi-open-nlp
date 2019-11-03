@@ -10,6 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -21,7 +22,7 @@ public class PreTrainedTokenizerTest extends PreTrainedProcessorTest<PreTrainedT
 
     @Test
     public void shouldTokenize() {
-        setModelFilePath("/models/en-token.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-token.bin").getFile());
         testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                            "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
                            "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +

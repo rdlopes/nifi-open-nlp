@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.NAMEFIND_NAME_TYPE;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -94,7 +95,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindDates() {
-        setModelFilePath("/models/en-ner-date.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-date.bin").getFile());
         assertProcessorCanFind("date",
                                new String[]{
                                        "Pierre",
@@ -169,7 +170,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindLocations() {
-        setModelFilePath("/models/en-ner-location.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-location.bin").getFile());
         assertProcessorCanFind("location",
                                new String[]{
                                        "Pierre",
@@ -244,7 +245,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindMoney() {
-        setModelFilePath("/models/en-ner-money.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-money.bin").getFile());
         assertProcessorCanFind("money",
                                nameList -> assertThat(nameList).isEmpty(),
                                nameSpans -> assertThat(nameSpans).isEmpty(),
@@ -253,7 +254,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindOrganizations() {
-        setModelFilePath("/models/en-ner-organization.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-organization.bin").getFile());
         assertProcessorCanFind("organization",
                                new String[]{
                                        "Pierre",
@@ -328,7 +329,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindPercentage() {
-        setModelFilePath("/models/en-ner-percentage.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-percentage.bin").getFile());
         assertProcessorCanFind("percentage",
                                nameList -> assertThat(nameList).isEmpty(),
                                nameSpans -> assertThat(nameSpans).isEmpty(),
@@ -337,7 +338,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindPersons() {
-        setModelFilePath("/models/en-ner-person.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-person.bin").getFile());
         assertProcessorCanFind("person",
                                new String[]{
                                        "Pierre",
@@ -414,7 +415,7 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
 
     @Test
     public void shouldFindTime() {
-        setModelFilePath("/models/en-ner-time.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-time.bin").getFile());
         assertProcessorCanFind("time",
                                nameList -> assertThat(nameList).isEmpty(),
                                nameSpans -> assertThat(nameSpans).isEmpty(),

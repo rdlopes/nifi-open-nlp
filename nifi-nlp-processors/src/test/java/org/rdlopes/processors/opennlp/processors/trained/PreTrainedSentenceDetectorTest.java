@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -20,7 +21,7 @@ public class PreTrainedSentenceDetectorTest extends PreTrainedProcessorTest<PreT
 
     @Test
     public void shouldDetectSentenceFromTimesheetQuestion() {
-        setModelFilePath("/models/en-sent.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-sent.bin").getFile());
         testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                            "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
                            "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +

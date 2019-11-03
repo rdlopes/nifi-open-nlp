@@ -9,6 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -19,7 +20,7 @@ public class PreTrainedLanguageDetectorTest extends PreTrainedProcessorTest<PreT
 
     @Test
     public void shouldDetectPortuguese() {
-        setModelFilePath("/models/langdetect-183.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/langdetect-183.bin").getFile());
         testRunner.enqueue("estava em uma marcenaria na Rua Bruno");
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

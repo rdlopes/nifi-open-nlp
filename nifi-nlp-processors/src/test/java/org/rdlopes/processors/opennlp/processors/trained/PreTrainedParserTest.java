@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.PARSER_PARSE_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.PARSER_PARSES_COUNT;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -23,7 +24,7 @@ public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedPars
 
     @Test
     public void shouldParse() {
-        setModelFilePath("/models/en-parser-chunking.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-parser-chunking.bin").getFile());
         testRunner.setProperty(PARSER_PARSES_COUNT.descriptor, "3");
         Map<String, String> attributes = new HashMap<>();
         TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, new String[]{

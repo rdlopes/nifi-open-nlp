@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -21,7 +22,7 @@ public class PreTrainedLemmatizerTest extends PreTrainedProcessorTest<PreTrained
 
     @Test
     public void shouldLemmatizeOpenNLPExample() {
-        setModelFilePath("/models/en-lemmatizer.bin");
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-lemmatizer.bin").getFile());
         Map<String, String> attributes = new HashMap<>();
         TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, new String[]{
                 "NNP", "NNP", ",", "CD", "NNS", "JJ", ",", "MD", "VB", "DT", "NN", "IN", "DT", "JJ", "NN", "NNP", ".", "CD", ".", "NNP", ".", "NNP", "VBZ",

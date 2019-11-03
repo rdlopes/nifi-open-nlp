@@ -11,6 +11,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
 import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
@@ -22,7 +23,7 @@ public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfi
 
     @Test
     public void shouldTokenizeWithSimpleTokenizer() {
-        setTokenizerType(TokenizerType.SIMPLE);
+        testRunner.setProperty(TOKENIZE_TOKENIZER_TYPE.descriptor, TokenizerType.SIMPLE.name());
         testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                            "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
                            "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +
@@ -65,7 +66,7 @@ public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfi
 
     @Test
     public void shouldTokenizeWithWhitespaceTokenizer() {
-        setTokenizerType(TokenizerType.WHITESPACE);
+        testRunner.setProperty(TOKENIZE_TOKENIZER_TYPE.descriptor, TokenizerType.WHITESPACE.name());
         testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
                            "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
                            "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +
