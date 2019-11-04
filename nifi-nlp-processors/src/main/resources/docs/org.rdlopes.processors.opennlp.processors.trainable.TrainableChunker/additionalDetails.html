@@ -8,5 +8,41 @@
 </head>
 
 <body>
+
+<h2>TrainableChunker</h2>
+
+Table of contents:
+<ul>
+    <li><a href="#opennlp">OpenNLP Chunker</a></li>
+    <li><a href="#configuration">Configuration Properties</a></li>
+    <li><a href="#input">Input Data</a></li>
+    <li><a href="#output">Output Data</a></li>
+</ul>
+
+
+<h3 id="opennlp">OpenNLP Chunker</h3>
+<p>
+    This processor wraps the evaluation from
+    <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.chunker">
+        OpenNLP Chunker
+    </a>
+    trained with configured data.
+</p>
+<p>
+    It splits text into syntactically correlated parts for sentence analysis.
+</p>
+
+<h3 id="configuration">Configuration Properties</h3>
+
+<p>
+    As a trainable processor, the NLP model will be built at validation time.
+    As such, it requires training data to generate the model.
+    The training data can be provided as a file or directly as a string.
+</p>
+
+<h3 id="input">Input Data</h3>
+
+<h3 id="output">Output Data</h3>
+
 </body>
 </html>

@@ -26,7 +26,7 @@ public class ChunkerTool extends NLPTool<ChunkerModel> {
         String[] tagsList = TAGPOS_TAG_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
         String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
 
-        ChunkerME chunker = new ChunkerME(model);
+        Chunker chunker = new ChunkerME(model);
         String[] chunkList = chunker.chunk(tokensList, tagsList);
         Span[] spanList = chunker.chunkAsSpans(tokensList, tagsList);
 

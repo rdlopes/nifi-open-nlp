@@ -31,7 +31,7 @@ public class PreTrainedDocumentCategorizerTest extends PreTrainedProcessorTest<P
         Map<String, String> attributes = new HashMap<>();
         SENTDET_CHUNK_LIST.updateAttributesWithJson(attributes, singletonList("Have a nice day!"));
 
-        testRunner.enqueue("", attributes);
+        testRunner.enqueue("Have a nice day!", attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);

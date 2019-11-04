@@ -35,23 +35,9 @@ public class TokenizerTool extends NLPTool<TokenizerModel> {
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, TokenizerModel model, Map<String, String> evaluation)
             throws IOException {
 
-        Tokenizer tokenizer;
-        if (TOKENIZE_TOKENIZER_TYPE.isSetIn(processContext)) {
-            switch (TOKENIZE_TOKENIZER_TYPE.getEnumFrom(processContext, TokenizerType.class)) {
-                case WHITESPACE:
-                    tokenizer = WhitespaceTokenizer.INSTANCE;
-                    break;
-                case SIMPLE:
-                    tokenizer = SimpleTokenizer.INSTANCE;
-                    break;
-                default:
-                    tokenizer = new TokenizerME(model);
-                    break;
-            }
-
-        } else {
-            tokenizer = new TokenizerME(model);
-        }
+        Tokenizer tokenizer = TOKENIZE_TOKENIZER_TYPE.isSetIn(processContext)
+                              ? TOKENIZE_TOKENIZER_TYPE.getEnumFrom(processContext, TokenizerType.class).tokenizer
+                              : new TokenizerME(model);
 
         String contentString = IOUtils.toString(content, charset);
         String normalizedContent = normalizeTokenizedContent(contentString);

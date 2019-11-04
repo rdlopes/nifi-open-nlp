@@ -27,15 +27,8 @@ public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedPars
         testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-parser-chunking.bin").getFile());
         testRunner.setProperty(PARSER_PARSES_COUNT.descriptor, "3");
         Map<String, String> attributes = new HashMap<>();
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, new String[]{
-                "Pierre", "Vinken", ",", "61", "years", "old", ",", "will", "join", "the", "board", "as", "a", "nonexecutive", "director",
-                "Nov", ".", "29", ".", "Mr", ".", "Vinken", "is", "chairman", "of", "Elsevier", "N", ".", "V", ".", ",", "the", "Dutch",
-                "publishing", "group", ".", "Rudolph", "Agnew", ",", "55", "years", "old", "and", "former", "chairman", "of", "Consolidated",
-                "Gold", "Fields", "PLC", ",", "was", "named", "a", "director", "of", "this", "British", "industrial", "conglomerate", "."});
-        testRunner.enqueue("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .\n" +
-                           "Mr. Vinken is chairman of Elsevier N.V. , the Dutch publishing group .\n" +
-                           "Rudolph Agnew , 55 years old and former chairman of Consolidated Gold Fields PLC , was named\n" +
-                           "    a director of this British industrial conglomerate .", attributes);
+        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_SIMPLE);
+        testRunner.enqueue(SAMPLE_CONTENT, attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
@@ -46,21 +39,46 @@ public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedPars
         flowFile.assertAttributeExists(PARSER_PARSE_LIST.key);
         List<String> parsesList = PARSER_PARSE_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
         assertThat(parsesList).containsExactly(
-                "(TOP (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (PP (IN as) (NP (DT a) " +
-                "(JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)))))) (VP (VBZ is) (NP (NP (NP (NN chairman)) (PP (IN of) (NP (NNP Elsevier) (NNP N) " +
-                "(NNP .) (NNP V) (NNP .)))) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) (NN group))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (PP (S (UCP (ADJP (NP (CD 55) (NNS years)) " +
-                "(JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) (S (NP (NP " +
-                "(DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))",
-                "(TOP (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (SBAR (IN as) (S (NP (DT a)" +
-                " (JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) (NNP .)" +
-                " (NNP V) (NNP .)) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) (NN group))))))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (SBAR (S (UCP (ADJP (NP (CD 55) (NNS years)) " +
-                "(JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) (S (NP (NP " +
-                "(DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))",
-                "(TOP (S (S (S (NP (NP (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (PP (IN as) (NP (DT a) " +
-                "(JJ nonexecutive) (NN director) (NNP Nov) (NNP .) (CD 29) (. .) (NNP Mr) (. .) (NNP Vinken)))))) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) " +
-                "(NNP .) (NNP V) (NNP .)) (, ,) (NP (DT the) (JJ Dutch) (NN publishing) (NN group))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (SBAR (S (UCP (ADJP (NP (CD 55) (NNS years)) " +
-                "(JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) (S (NP (NP " +
-                "(DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))))) (. .)))");
+                "(TOP (S (S (S (NP (NN ==)) (VP (VB Please) (S (VP (VB notice) (SBAR (IN that) (S (NP (DT this) (NN announcement)) (VP (MD will) (VP (VB be) (VP (VBN updated) (PP (IN at) " +
+                "(NP (NP (CD 10)) (: :) (S (NP (CD 30)) (VP (VBP AM) (, ,) (S (NP (NP (CD 3)) (: :) (NP (NP (NP (CD 00) (NNP PM)) (CC and) (NP (CD 7))) (: :) (S (NP (NP (CD 00) (NNP PM) " +
+                "(NNP ==) (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (SBAR (IN as) (S (NP (DT a) " +
+                "(FW non) (: -) (NN executive) (NN director) (NNP Nov) (. .) (CD 29) (NN th) (. .) (NNP Mr) (. .) (NNP Vinken)) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP " +
+                "Elsevier) (NNP N) (NNP .) (NNP V) (NNP .)) (, ,) (NP (NP (DT the) (JJ Dutch) (NN publishing) (NN group)) (SBAR (WHNP (WDT that)) (S (VP (VBZ owns) (NP (NP (CD 40) (NN %)) " +
+                "(PP (IN of) (NP (NP (NP (NP (VBN published) (NNS magazines)) (PP (IN in) (NP (DT the) (NNP Netherlands)))) (CC and) (NP (NP (CD 10) (NN %)) (PP (IN in) (NP (NNP Belgium))))) " +
+                "(. .) (NNP Elsevier) (NNP N) (NNP .) (NNP V))))))))))))))))))) (. .) (ADVP (RB now)) (VP (VBZ represents) (NP (NP (CD 51) (NN %)) (PP (IN of) (NP (NP (DT the) (JJ total) (NN " +
+                "capital))" +
+                " (PP (IN of) (NP (DT the) (NN company))))))))))))))))))))) (, ,) (S (VP (NN worth) (NP (NP (QP (JJR more) (IN than) ($ $) (CD 800))) (. .) (CD 000) (VP (LST (-LRB- -LRB-)) (NP (LST" +
+                " " +
+                "(LS 1) (. .)) (NP (CD 000)) (. .) (NP (CD 000) (NNS euros)) (, ,) (NP (CD 900) (. .) (CD 000) (NNS pounds)) (-RRB- -RRB-))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (S " +
+                "(UCP" +
+                " (ADJP (NP (CD 55) (NNS years)) (JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was)" +
+                " " +
+                "(VP (VBN named) (S (NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate))))))))))) (. .)))",
+                "(TOP (S (S (NP (NN ==)) (VP (VB Please) (S (VP (VB notice) (SBAR (IN that) (S (NP (DT this) (NN announcement)) (VP (MD will) (VP (VB be) (VP (VBN updated) (PP (IN at) (NP (NP (CD " +
+                "10)) " +
+                "(: :) (S (NP (CD 30)) (VP (VBP AM) (, ,) (S (NP (NP (CD 3)) (: :) (NP (NP (NP (CD 00) (NNP PM)) (CC and) (NP (CD 7))) (: :) (S (NP (NP (CD 00) (NNP PM) (NNP ==) (NNP Pierre) " +
+                "(NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (SBAR (IN as) (S (NP (DT a) (FW non) (: -) (NN executive)" +
+                " (NN director) (NNP Nov) (. .) (CD 29) (NN th) (. .) (NNP Mr) (. .) (NNP Vinken)) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) (NNP .) (NNP V) " +
+                "(NNP .)) (, ,) (NP (NP (DT the) (JJ Dutch) (NN publishing) (NN group)) (SBAR (WHNP (WDT that)) (S (VP (VBZ owns) (NP (NP (CD 40) (NN %)) (PP (IN of) (NP (NP (NP (NP (VBN published)" +
+                " (NNS magazines)) (PP (IN in) (NP (DT the) (NNP Netherlands)))) (CC and) (NP (NP (CD 10) (NN %)) (PP (IN in) (NP (NNP Belgium))))) (. .) (NNP Elsevier) (NNP N) (NNP .) " +
+                "(NNP V))))))))))))))))))) (. .) (ADVP (RB now)) (VP (VBZ represents) (NP (NP (CD 51) (NN %)) (PP (IN of) (NP (NP (DT the) (JJ total) (NN capital)) (PP (IN of) (NP (DT the)" +
+                " (NN company))))))))))))))))))))) (, ,) (S (VP (NN worth) (NP (NP (QP (JJR more) (IN than) ($ $) (CD 800))) (. .) (CD 000) (PP (VP (LST (-LRB- -LRB-)) (NP (LST (LS 1) (. .)) " +
+                "(NP (CD 000)) (. .) (NP (CD 000) (NNS euros)) (, ,) (NP (CD 900) (. .) (CD 000) (NNS pounds)) (-RRB- -RRB-))))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (S (UCP (ADJP " +
+                "(NP (CD 55) (NNS years)) (JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) " +
+                "(VP (VBN named) (S (NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate))))))))))) (. .)))",
+                "(TOP (S (S (S (NP (NN ==)) (VP (VB Please) (S (VP (VB notice) (SBAR (IN that) (S (NP (DT this) (NN announcement)) (VP (MD will) (VP (VB be) (VP (VBN updated) (PP (IN at) (NP " +
+                "(NP (CD 10)) (: :) (S (NP (CD 30)) (VP (VBP AM) (, ,) (S (NP (NP (CD 3)) (: :) (NP (NP (NP (CD 00) (NNP PM)) (CC and) (NP (CD 7))) (: :) (S (NP (NP (CD 00) (NNP PM) (NNP ==)" +
+                " (NNP Pierre) (NNP Vinken)) (, ,) (ADJP (NP (CD 61) (NNS years)) (JJ old))) (, ,) (VP (MD will) (VP (VB join) (NP (DT the) (NN board)) (SBAR (IN as) (S (NP (DT a) (FW non) (: -)" +
+                " (NN executive) (NN director) (NNP Nov) (. .) (CD 29) (NN th) (. .) (NNP Mr) (. .) (NNP Vinken)) (VP (VBZ is) (NP (NP (NN chairman)) (PP (IN of) (NP (NP (NNP Elsevier) (NNP N) " +
+                "(NNP .) (NNP V) (NNP .)) (, ,) (NP (NP (DT the) (JJ Dutch) (NN publishing) (NN group)) (SBAR (WHNP (WDT that)) (S (VP (VBZ owns) (NP (NP (CD 40) (NN %)) (PP (IN of) (NP (NP (NP " +
+                "(NP (VBN published) (NNS magazines)) (PP (IN in) (NP (DT the) (NNP Netherlands)))) (CC and) (NP (NP (CD 10) (NN %)) (PP (IN in) (NP (NNP Belgium))))) (. .) (NNP Elsevier) (NNP N)" +
+                " (NNP .) (NNP V))))))))))))))))))) (. .) (ADVP (RB now)) (VP (VBZ represents) (NP (NP (CD 51) (NN %)) (PP (IN of) (NP (NP (DT the) (JJ total) (NN capital)) (PP (IN of) (NP (DT the)" +
+                " " +
+                "(NN company))))))))))))))))))))) (, ,) (S (VP (NN worth) (NP (NP (NP (QP (JJR more) (IN than) ($ $) (CD 800))) (. .) (CD 000) (VP (LST (-LRB- -LRB-)) (NP (LST (LS 1) (. .)) (NP " +
+                "(CD 000))))) (. .) (NP (CD 000) (NNS euros)) (, ,) (NP (CD 900) (. .) (CD 000) (NNS pounds)) (-RRB- -RRB-))))) (. .) (NP (NP (NNP Rudolph) (NNP Agnew)) (, ,) (UCP (ADJP (NP (CD 55)" +
+                " " +
+                "(NNS years)) (JJ old)) (CC and) (S (NP (NP (JJ former) (NN chairman)) (PP (IN of) (NP (NNP Consolidated) (NNP Gold) (NNP Fields) (NNP PLC)))) (, ,) (VP (VBD was) (VP (VBN named) " +
+                "(S (NP (NP (DT a) (NN director)) (PP (IN of) (NP (DT this) (JJ British) (JJ industrial) (NN conglomerate)))))))))) (. .)))");
     }
 
 }

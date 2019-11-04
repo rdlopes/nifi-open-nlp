@@ -20,7 +20,6 @@ public enum NLPAttribute {
     // sentence detector
     SENTDET_CHUNK_LIST("nlp.sentdet.chunk.list", "Holds the sentence chunks list found in the flow file content."),
     SENTDET_SPAN_LIST("nlp.sentdet.span.list", "Holds the sentence chunks list found in the flow file content, as a JSON span list."),
-    SENTDET_PROBABILITIES("nlp.sentdet.probabilities", "The engine probabilities for the parsing."),
     // document categorizer
     DOCCAT_CATEGORY_LIST("nlp.doccat.category.list", "Holds the list of categories found by the trained model, as a JSON list."),
     DOCCAT_CATEGORY_BEST("nlp.doccat.category.best", "Holds the best category name found by trained model."),
@@ -32,23 +31,17 @@ public enum NLPAttribute {
     LANGDET_SUPPORTED_LANGUAGE_LIST("nlp.langdet.supported.language.list", "Holds the language list supported by NLP engine, as a JSON string list."),
     // lemmatizer
     LEMMATIZE_LEMMA_LIST("nlp.lemmatize.lemma.list", "Lemmas list as evaluated from flow file content."),
-    LEMMATIZE_PREDICTED_LIST("nlp.lemmatize.predicted.list", "List of predicted lemmas."),
-    LEMMATIZE_PREDICTED_SES_LIST("nlp.lemmatize.predicted.ses.list.size", "SES prediction list"),
-    LEMMATIZE_PROBABILITIES("nlp.lemmatize.probabilities", "Lemmas probabilities, as a JSON list of doubles."),
-    LEMMATIZE_TOPK_LIST("nlp.lemmatize.topk.list", "Top K lemmas list."),
-    LEMMATIZE_TOPK_SEQUENCE_LIST("nlp.lemmatize.topk.sequence.list", "Top K sequence list."),
     // name finder
     NAMEFIND_NAME_LIST("nlp.namefind.name.list", "Holds  the list of names found in flow file content, as a JSON strings list."),
     NAMEFIND_SPAN_LIST("nlp.namefind.span.list", "Holds  the list of names spans found in flow file content, as a JSON span list."),
-    NAMEFIND_PROBABILITIES("nlp.namefind.probabilities", "Holds probabilities for each span prediction from flow file content."),
 
     PARSER_PARSE_LIST("nlp.parser.parse.list", "Holds the list of parses found in flow file content.");
+
+    public final String key;
 
     private final String description;
 
     private final Gson gson = new Gson();
-
-    public final String key;
 
     NLPAttribute(String key, String description) {
         this.key = key;

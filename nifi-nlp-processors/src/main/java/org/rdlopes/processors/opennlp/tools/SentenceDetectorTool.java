@@ -24,16 +24,14 @@ public class SentenceDetectorTool extends NLPTool<SentenceModel> {
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, SentenceModel model, Map<String, String> evaluation)
             throws IOException {
-        SentenceDetectorME detector = new SentenceDetectorME(model);
+        SentenceDetector detector = new SentenceDetectorME(model);
         String contentString = IOUtils.toString(content, charset);
 
         String[] chunks = detector.sentDetect(contentString);
         Span[] chunkAsSpans = detector.sentPosDetect(contentString);
-        double[] probabilities = detector.getSentenceProbabilities();
 
         NLPAttribute.SENTDET_CHUNK_LIST.updateAttributesWithJson(attributes, chunks);
         NLPAttribute.SENTDET_SPAN_LIST.updateAttributesWithJson(attributes, chunkAsSpans);
-        NLPAttribute.SENTDET_PROBABILITIES.updateAttributesWithJson(attributes, probabilities);
     }
 
     @Override

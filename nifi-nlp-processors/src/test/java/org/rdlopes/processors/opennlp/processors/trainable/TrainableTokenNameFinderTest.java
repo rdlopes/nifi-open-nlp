@@ -26,8 +26,7 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
                                         String[] tokens,
                                         String data,
                                         Consumer<List<String>> nameListAssertion,
-                                        Consumer<List<Span>> spanListAssertion,
-                                        Consumer<List<Double>> probabilitiesAssertion) {
+                                        Consumer<List<Span>> spanListAssertion) {
         testRunner.setProperty(NAMEFIND_NAME_TYPE.descriptor, nameType);
         testRunner.assertValid();
 
@@ -45,15 +44,12 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
 
         flowFile.assertAttributeExists(NAMEFIND_NAME_LIST.key);
         flowFile.assertAttributeExists(NAMEFIND_SPAN_LIST.key);
-        flowFile.assertAttributeExists(NAMEFIND_PROBABILITIES.key);
 
         List<String> nameList = NAMEFIND_NAME_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
         List<Span> nameSpans = NAMEFIND_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
-        List<Double> probabilities = NAMEFIND_PROBABILITIES.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Double>>() {});
 
         nameListAssertion.accept(nameList);
         spanListAssertion.accept(nameSpans);
-        probabilitiesAssertion.accept(probabilities);
     }
 
     @Test
@@ -65,10 +61,7 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
                                new String[]{"Hi", "Mike", ",", "it's", "Stefanie", "Schmidt", "."},
                                "",
                                names -> assertThat(names).containsExactly("Mike", "Stefanie Schmidt"),
-                               spans -> assertThat(spans).containsExactly(new Span(1, 2, "default"), new Span(4, 6, "default")),
-                               probabilities -> assertThat(probabilities).containsExactly(
-                                       0.9357052060330299, 0.9629181679586647, 0.987971659893104, 0.9949441347953653,
-                                       0.9623310796558195, 0.9616806156295147, 0.9875749552188686));
+                               spans -> assertThat(spans).containsExactly(new Span(1, 2, "default"), new Span(4, 6, "default")));
     }
 
 }
