@@ -10,40 +10,17 @@
 <body>
 
 <h2>TrainableChunker</h2>
-
-Table of contents:
 <ul>
-    <li><a href="#tool">OpenNLP Tool</a></li>
     <li><a href="#training">Training</a></li>
-    <li><a href="#input">Input Data</a></li>
-    <li><a href="#output">Output Data</a></li>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
 </ul>
-
-
-<h3 id="tool">OpenNLP Chunker</h3>
-<p>
-    This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.chunker">
-    OpenNLP Chunker
-</a>. It creates its model from training data provided to the processor via configuration.
-</p>
-<p>
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.chunker">Chunker</a>.
     OpenNLP Chunker splits text into syntactically correlated parts for sentence analysis.
-</p>
+    It creates its model from training data provided to the processor via configuration.</p>
 
 <h3 id="training">Training</h3>
-<p>
-    OpenNLP Chunker takes training data in <a href="http://www.cnts.ua.ac.be/conll2000/chunking">CoNLL2000</a> format.
-    You can configure training data for the processor by using one of the two properties:
-</p>
-<ul>
-    <li>
-        <strong>TRAINABLE_TRAINING_FILE_PATH</strong> pointing at an existing training file path.
-    </li>
-    <li>
-        <strong>TRAINABLE_TRAINING_DATA</strong> containing the raw data to train the processor.
-    </li>
-</ul>
-
+<p>TrainableChunker takes training data in <a href="http://www.cnts.ua.ac.be/conll2000/chunking">CoNLL2000</a> format.</p>
 <p>Sample training data:</p>
 <pre>
 He        PRP  B-NP
@@ -63,38 +40,36 @@ in        IN   B-PP
 September NNP  B-NP
 .         .    O
 </pre>
+<p>Training data is passed either via a file or directly in properties as raw data.
+    In case both properties would be set, then the model would be trained by:</p>
+<ol>
+    <li>training data file first</li>
+    <li>then the training data</li>
+</ol>
 
-<h3 id="input">Input Data</h3>
-<p>
-    As to work properly, processor requires the following attributes to be available in the flow file:
-</p>
+
+<h3 id="evaluation">Evaluation</h3>
+<p>TrainableChunker runs against:</p>
 <ul>
     <li>
-        <strong>nlp.tokenizer.tokens.list</strong>: A tokens list, built by the means of a <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">
-        TrainableTokenizer</a> or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">
-        PreTrainedTokenizer</a>.
+        A tokens list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">TrainableTokenizer</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">PreTrainedTokenizer</a>.
     </li>
     <li>
-        <strong>nlp.pos.tagger.tags.list</strong>: A tags list, built by the means of a <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainablePOSTagger/additionalDetails.html">
-        TrainablePOSTagger</a> or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedPOSTagger/additionalDetails.html">
-        PreTrainedPOSTagger</a>.
+        A tags list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainablePOSTagger/additionalDetails.html">TrainablePOSTagger</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedPOSTagger/additionalDetails.html">PreTrainedPOSTagger</a>.
     </li>
 </ul>
-<p>
-    Since all data required by the processor lies in the attributes, the processor will not open flow file content.
-</p>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
 
-<h3 id="output">Output Data</h3>
-<p>
-    OpenNLP Chunker chunks text into smaller meaningful parts, and writes its evaluation results to two attributes:
-</p>
+<h3 id="output">Output</h3>
+<p>TrainableChunker will enrich flow file attributes with</p>
 <ul>
-    <li>
-        <strong>nlp.pos.tagger.tags.list</strong>: The list of chunks evaluated.
-    </li>
-    <li>
-        <strong>nlp.pos.tagger.tags.list</strong>: The spans for each chunk found.
-    </li>
+    <li><strong>nlp.chunker.chunks.list</strong>: the chunks list</li>
+    <li><strong>nlp.chunker.chunks.span</strong>: the chunks span</li>
 </ul>
 
 </body>
