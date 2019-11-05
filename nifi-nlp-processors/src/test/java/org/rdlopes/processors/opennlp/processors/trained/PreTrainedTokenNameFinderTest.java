@@ -30,21 +30,19 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_SIMPLE);
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
         testRunner.enqueue(SAMPLE_CONTENT, attributes);
         testRunner.run();
         testRunner.assertTransferCount(NLPProcessor.RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TAGPOS_TAG_LIST.key, attributes.get(TAGPOS_TAG_LIST.key));
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        flowFile.assertAttributeExists(NAMEFIND_NAME_LIST.key);
-        flowFile.assertAttributeExists(NAMEFIND_SPAN_LIST.key);
-
-        List<String> nameList = NAMEFIND_NAME_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        List<Span> nameSpans = NAMEFIND_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+        flowFile.assertAttributeExists(TOKEN_NAME_FINDER_NAMES_LIST_KEY);
+        List<String> nameList = get(TOKEN_NAME_FINDER_NAMES_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(TOKEN_NAME_FINDER_NAMES_SPAN_KEY);
+        List<Span> nameSpans = get(TOKEN_NAME_FINDER_NAMES_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
         nameListAssertion.accept(nameList);
         spanListAssertion.accept(nameSpans);

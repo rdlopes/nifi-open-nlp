@@ -6,6 +6,8 @@ import opennlp.tools.util.TrainingParameters;
 import opennlp.tools.util.model.BaseModel;
 import org.apache.nifi.annotation.behavior.EventDriven;
 import org.apache.nifi.annotation.behavior.SupportsBatching;
+import org.apache.nifi.annotation.behavior.WritesAttribute;
+import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.lifecycle.OnRemoved;
 import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
@@ -16,6 +18,7 @@ import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
+import org.rdlopes.processors.opennlp.common.NLPAttribute;
 import org.rdlopes.processors.opennlp.tools.NLPTool;
 
 import java.nio.charset.Charset;
@@ -31,12 +34,14 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static opennlp.tools.ml.AbstractTrainer.VERBOSE_PARAM;
 import static opennlp.tools.util.TrainingParameters.*;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.COMMON_ERROR;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.NLP_EVALUATION_ERROR_DESCRIPTION;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.NLP_EVALUATION_ERROR_KEY;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
 @EventDriven
 @SupportsBatching
 @EqualsAndHashCode(callSuper = true)
+@WritesAttributes({@WritesAttribute(attribute = NLP_EVALUATION_ERROR_KEY, description = NLP_EVALUATION_ERROR_DESCRIPTION)})
 public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> extends AbstractProcessor {
     public static final Relationship RELATIONSHIP_SUCCESS = new Relationship.Builder()
             .name("success")
@@ -156,7 +161,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
             getLogger().debug("onTrigger | flow file content evaluated: {}", new Object[]{attributes});
 
         } catch (Exception e) {
-            flowFile = COMMON_ERROR.updateFlowFile(processSession, flowFile, e.getMessage());
+            flowFile = NLPAttribute.set(NLP_EVALUATION_ERROR_KEY, processSession, flowFile, e.getMessage());
             relationship = RELATIONSHIP_UNMATCHED;
             getLogger().warn("Error while evaluating content", e);
 

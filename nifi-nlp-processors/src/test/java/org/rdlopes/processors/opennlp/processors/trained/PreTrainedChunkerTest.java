@@ -24,20 +24,23 @@ public class PreTrainedChunkerTest extends PreTrainedProcessorTest<PreTrainedChu
     public void shouldChunk() {
         testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-chunker.bin").getFile());
         Map<String, String> attributes = new HashMap<>();
-        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, SAMPLE_TAGS_SIMPLE);
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_SIMPLE);
+        set(POS_TAGGER_TAGS_LIST_KEY, attributes, SAMPLE_TAGS_SIMPLE);
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
+
         testRunner.enqueue(SAMPLE_CONTENT, attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TAGPOS_TAG_LIST.key, attributes.get(TAGPOS_TAG_LIST.key));
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
-        flowFile.assertAttributeExists(CHUNK_CHUNK_LIST.key);
-        flowFile.assertAttributeExists(CHUNK_SPAN_LIST.key);
+        flowFile.assertAttributeEquals(POS_TAGGER_TAGS_LIST_KEY, attributes.get(POS_TAGGER_TAGS_LIST_KEY));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        List<String> chunkList = CHUNK_CHUNK_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(CHUNKER_CHUNKS_LIST_KEY);
+        List<String> chunkList = get(CHUNKER_CHUNKS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(CHUNKER_CHUNKS_SPAN_KEY);
+        List<Span> chunkSpans = get(CHUNKER_CHUNKS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+
         assertThat(chunkList).containsExactly(
                 "B-NP", "B-VP", "B-NP", "B-PP", "B-NP", "I-NP", "B-VP", "I-VP", "I-VP", "B-PP", "B-NP", "O", "B-NP", "I-NP", "O", "B-NP", "O", "B-NP", "I-NP", "I-NP", "I-NP", "O", "B-NP", "I-NP",
                 "I-NP", "I-NP", "I-NP", "O", "B-NP", "I-NP", "B-ADJP", "O", "B-VP", "I-VP", "B-NP", "I-NP", "B-PP", "B-NP", "I-NP", "O", "B-NP", "I-NP", "B-NP", "O", "B-NP", "I-NP", "O", "O", "O",
@@ -46,7 +49,6 @@ public class PreTrainedChunkerTest extends PreTrainedProcessorTest<PreTrainedChu
                 "O", "B-VP", "B-NP", "I-NP", "I-NP", "I-NP", "O", "B-ADVP", "B-NP", "I-NP", "B-NP", "I-NP", "O", "B-NP", "I-NP", "O", "B-NP", "O", "B-NP", "I-NP", "O", "B-NP", "I-NP", "I-NP", "O",
                 "B-NP", "I-NP", "B-ADJP", "O", "B-ADVP", "B-NP", "B-PP", "B-NP", "I-NP", "I-NP", "I-NP", "O", "B-VP", "I-VP", "B-NP", "I-NP", "B-PP", "B-NP", "I-NP", "I-NP", "I-NP", "O");
 
-        List<Span> chunkSpans = CHUNK_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
         assertThat(chunkSpans).containsExactly(
                 new Span(0, 1, "NP"), new Span(1, 2, "VP"), new Span(2, 3, "NP"), new Span(3, 4, "PP"), new Span(4, 6, "NP"),
                 new Span(6, 9, "VP"), new Span(9, 10, "PP"), new Span(10, 11, "NP"), new Span(12, 14, "NP"), new Span(15, 16, "NP"),

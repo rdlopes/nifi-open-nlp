@@ -5,6 +5,7 @@ import lombok.Getter;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.processors.TokenNameFinderProcessor;
 import org.rdlopes.processors.opennlp.tools.TokenNameFinderTool;
 
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.NAMEFIND_NAME_TYPE;
 
 @EqualsAndHashCode(callSuper = true)
+@TokenNameFinderProcessor
 public class PreTrainedTokenNameFinder extends NLPProcessor<TokenNameFinderModel, TokenNameFinderTool> {
 
     @Getter

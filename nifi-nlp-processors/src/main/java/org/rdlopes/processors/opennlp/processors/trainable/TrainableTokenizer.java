@@ -3,11 +3,13 @@ package org.rdlopes.processors.opennlp.processors.trainable;
 import lombok.EqualsAndHashCode;
 import opennlp.tools.tokenize.TokenizerModel;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.processors.TokenizerProcessor;
 import org.rdlopes.processors.opennlp.tools.TokenizerTool;
 
 import java.nio.file.Path;
 
 @EqualsAndHashCode(callSuper = true)
+@TokenizerProcessor
 public class TrainableTokenizer extends NLPProcessor<TokenizerModel, TokenizerTool> {
 
     public TrainableTokenizer() {

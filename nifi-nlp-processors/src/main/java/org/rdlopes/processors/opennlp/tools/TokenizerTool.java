@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 
 public class TokenizerTool extends NLPTool<TokenizerModel> {
@@ -44,8 +43,8 @@ public class TokenizerTool extends NLPTool<TokenizerModel> {
         String[] tokensList = tokenizer.tokenize(normalizedContent);
         Span[] tokensAsSpans = tokenizer.tokenizePos(normalizedContent);
 
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, tokensList);
-        TOKENIZE_SPAN_LIST.updateAttributesWithJson(attributes, tokensAsSpans);
+        set(TOKENIZER_TOKENS_LIST_KEY, evaluation, tokensList);
+        set(TOKENIZER_TOKENS_SPAN_KEY, evaluation, tokensAsSpans);
     }
 
     @Override

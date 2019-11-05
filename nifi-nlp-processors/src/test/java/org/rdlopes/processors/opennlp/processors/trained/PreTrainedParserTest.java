@@ -9,8 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.PARSER_PARSE_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.PARSER_PARSES_COUNT;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
@@ -27,17 +26,18 @@ public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedPars
         testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-parser-chunking.bin").getFile());
         testRunner.setProperty(PARSER_PARSES_COUNT.descriptor, "3");
         Map<String, String> attributes = new HashMap<>();
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_SIMPLE);
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
+
         testRunner.enqueue(SAMPLE_CONTENT, attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        flowFile.assertAttributeExists(PARSER_PARSE_LIST.key);
-        List<String> parsesList = PARSER_PARSE_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(PARSER_PARSES_LIST_KEY);
+        List<String> parsesList = get(PARSER_PARSES_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
         assertThat(parsesList).containsExactly(
                 "(TOP (S (S (S (NP (NN ==)) (VP (VB Please) (S (VP (VB notice) (SBAR (IN that) (S (NP (DT this) (NN announcement)) (VP (MD will) (VP (VB be) (VP (VBN updated) (PP (IN at) " +
                 "(NP (NP (CD 10)) (: :) (S (NP (CD 30)) (VP (VBP AM) (, ,) (S (NP (NP (CD 3)) (: :) (NP (NP (NP (CD 00) (NNP PM)) (CC and) (NP (CD 7))) (: :) (S (NP (NP (CD 00) (NNP PM) " +

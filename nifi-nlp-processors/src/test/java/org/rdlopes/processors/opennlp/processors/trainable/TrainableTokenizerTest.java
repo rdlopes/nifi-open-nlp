@@ -8,8 +8,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINABLE_TRAINING_FILE_PATH;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
@@ -32,11 +31,10 @@ public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableToke
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
 
-        flowFile.assertAttributeExists(TOKENIZE_TOKEN_LIST.key);
-        flowFile.assertAttributeExists(TOKENIZE_SPAN_LIST.key);
-
-        List<String> tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        List<Span> tokenSpans = TOKENIZE_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_LIST_KEY);
+        List<String> tokensList = get(TOKENIZER_TOKENS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_SPAN_KEY);
+        List<Span> tokenSpans = get(TOKENIZER_TOKENS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
         assertThat(tokensList).containsExactly("Sounds", "like", "it", "'s", "not", "properly", "thought", "through", "!");
         assertThat(tokenSpans).containsExactly(

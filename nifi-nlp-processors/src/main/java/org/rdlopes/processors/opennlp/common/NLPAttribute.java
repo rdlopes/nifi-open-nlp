@@ -1,66 +1,103 @@
 package org.rdlopes.processors.opennlp.common;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import lombok.experimental.UtilityClass;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessSession;
 
 import java.util.Map;
 
-public enum NLPAttribute {
-    COMMON_ERROR("nlp.common.error", "Error message raised by processing the content, if any."),
-    // tokenizer
-    TOKENIZE_TOKEN_LIST("nlp.tokenize.token.list", "The list of tokens as found in the content of the flow file."),
-    TOKENIZE_SPAN_LIST("nlp.tokenize.span.list", "The list of tokens as found in the content of the flow file, as a JSON span list."),
-    // POS tagger
-    TAGPOS_TAG_LIST("nlp.tagpos.tag.list", "The list of tags found by the TagPOS tool, as a JSON list."),
-    // chunker
-    CHUNK_CHUNK_LIST("nlp.chunk.chunk.list", "The list of chunks found, as a JSON string list."),
-    CHUNK_SPAN_LIST("nlp.chunk.span.list", "The list of chunks found, as a JSON span list."),
-    // sentence detector
-    SENTDET_CHUNK_LIST("nlp.sentdet.chunk.list", "Holds the sentence chunks list found in the flow file content."),
-    SENTDET_SPAN_LIST("nlp.sentdet.span.list", "Holds the sentence chunks list found in the flow file content, as a JSON span list."),
-    // document categorizer
-    DOCCAT_CATEGORY_LIST("nlp.doccat.category.list", "Holds the list of categories found by the trained model, as a JSON list."),
-    DOCCAT_CATEGORY_BEST("nlp.doccat.category.best", "Holds the best category name found by trained model."),
-    DOCCAT_SCORE_MAP("nlp.doccat.score.map", "Holds the results of evaluating content with the trained model, as a <double, list<string>> JSON map."),
-    // language detector
-    LANGDET_PREDICTED_LANGUAGE("nlp.langdet.predicted.language", "Holds the language code predicted from flow file content."),
-    LANGDET_CONFIDENCE("nlp.langdet.confidence", "Holds the confidence for the made prediction."),
-    LANGDET_PROBABLE_LANGUAGE_LIST("nlp.langdet.probable.language.list", "Holds the probable languages for the flow file content, as a JSON languages list."),
-    LANGDET_SUPPORTED_LANGUAGE_LIST("nlp.langdet.supported.language.list", "Holds the language list supported by NLP engine, as a JSON string list."),
-    // lemmatizer
-    LEMMATIZE_LEMMA_LIST("nlp.lemmatize.lemma.list", "Lemmas list as evaluated from flow file content."),
-    // name finder
-    NAMEFIND_NAME_LIST("nlp.namefind.name.list", "Holds  the list of names found in flow file content, as a JSON strings list."),
-    NAMEFIND_SPAN_LIST("nlp.namefind.span.list", "Holds  the list of names spans found in flow file content, as a JSON span list."),
+@UtilityClass
+public final class NLPAttribute {
+    public static final String CHUNKER_CHUNKS_LIST_DESCRIPTION = "Chunks found in content, as a JSON String list.";
 
-    PARSER_PARSE_LIST("nlp.parser.parse.list", "Holds the list of parses found in flow file content.");
+    public static final String CHUNKER_CHUNKS_LIST_KEY = "nlp.chunker.chunks.list";
 
-    public final String key;
+    public static final String CHUNKER_CHUNKS_SPAN_DESCRIPTION = "Span of chunks found in content, as a JSON Span list.";
 
-    private final String description;
+    public static final String CHUNKER_CHUNKS_SPAN_KEY = "nlp.chunker.chunks.span";
 
-    private final Gson gson = new Gson();
+    public static final String DOCUMENT_CATEGORIZER_CATEGORIES_BEST_DESCRIPTION = "Best category found in content, probabilities wise";
 
-    NLPAttribute(String key, String description) {
-        this.key = key;
-        this.description = description;
+    public static final String DOCUMENT_CATEGORIZER_CATEGORIES_BEST_KEY = "nlp.document.categorizer.categories.best";
+
+    public static final String DOCUMENT_CATEGORIZER_CATEGORIES_LIST_DESCRIPTION = "Categories found in content, as a JSON String list.";
+
+    public static final String DOCUMENT_CATEGORIZER_CATEGORIES_LIST_KEY = "nlp.document.categorizer.categories.list";
+
+    public static final String DOCUMENT_CATEGORIZER_SCORE_MAP_DESCRIPTION = "A map associating descending probabilities and the corresponding categories, as a JSON Map<Double>, Set<String>>.";
+
+    public static final String DOCUMENT_CATEGORIZER_SCORE_MAP_KEY = "nlp.document.categorizer.score.map";
+
+    public static final String LANGUAGE_DETECTOR_LANGUAGES_BEST_DESCRIPTION = "Best language found in content, probabilities wise";
+
+    public static final String LANGUAGE_DETECTOR_LANGUAGES_BEST_KEY = "nlp.language.detector.languages.best";
+
+    public static final String LANGUAGE_DETECTOR_LANGUAGES_LIST_DESCRIPTION = "Languages found in content, as a JSON Language list.";
+
+    public static final String LANGUAGE_DETECTOR_LANGUAGES_LIST_KEY = "nlp.language.detector.languages.list";
+
+    public static final String LANGUAGE_DETECTOR_SUPPORTED_LIST_DESCRIPTION = "Languages supported by the model, as a JSON String list.";
+
+    public static final String LANGUAGE_DETECTOR_SUPPORTED_LIST_KEY = "nlp.language.detector.supported.list";
+
+    public static final String LEMMATIZER_LEMMAS_LIST_DESCRIPTION = "Lemmas found in content, as a JSON String list";
+
+    public static final String LEMMATIZER_LEMMAS_LIST_KEY = "nlp.lemmatizer.lemmas.list";
+
+    public static final String NLP_EVALUATION_ERROR_DESCRIPTION = "Error message raised by processing the content, if any.";
+
+    public static final String NLP_EVALUATION_ERROR_KEY = "nlp.evaluation.error";
+
+    public static final String PARSER_PARSES_LIST_DESCRIPTION = "Parses found in content, as a JSON String list.";
+
+    public static final String PARSER_PARSES_LIST_KEY = "nlp.parser.parses.list";
+
+    public static final String POS_TAGGER_TAGS_LIST_DESCRIPTION = "Tags found in content, as a JSON String list.";
+
+    public static final String POS_TAGGER_TAGS_LIST_KEY = "nlp.pos.tagger.tags.list";
+
+    public static final String SENTENCE_DETECTOR_SENTENCES_LIST_DESCRIPTION = "Sentences found in content, as a JSON String list.";
+
+    public static final String SENTENCE_DETECTOR_SENTENCES_LIST_KEY = "nlp.sentence.detector.sentences.list";
+
+    public static final String SENTENCE_DETECTOR_SENTENCES_SPAN_DESCRIPTION = "Span of sentences found in content, as a JSON Span list.";
+
+    public static final String SENTENCE_DETECTOR_SENTENCES_SPAN_KEY = "nlp.sentence.detector.sentences.span";
+
+    public static final String TOKENIZER_TOKENS_LIST_DESCRIPTION = "Tokens found in content, as a JSON String list.";
+
+    public static final String TOKENIZER_TOKENS_LIST_KEY = "nlp.tokenizer.tokens.list";
+
+    public static final String TOKENIZER_TOKENS_SPAN_DESCRIPTION = "Span of tokens found in content, as a JSON Span list.";
+
+    public static final String TOKENIZER_TOKENS_SPAN_KEY = "nlp.tokenizer.tokens.span";
+
+    public static final String TOKEN_NAME_FINDER_NAMES_LIST_DESCRIPTION = "Names found in content, as a JSON String list.";
+
+    public static final String TOKEN_NAME_FINDER_NAMES_LIST_KEY = "nlp.token.name.finder.names.list";
+
+    public static final String TOKEN_NAME_FINDER_NAMES_SPAN_DESCRIPTION = "Span of names found in content, as a JSON Span list.";
+
+    public static final String TOKEN_NAME_FINDER_NAMES_SPAN_KEY = "nlp.token.name.finder.names.span";
+
+    private static final Gson gson = new GsonBuilder().create();
+
+    public static <T> T get(String attribute, Map<String, String> attributes, TypeToken<T> type) {
+        return new Gson().fromJson(attributes.get(attribute), type.getType());
     }
 
-    public <T> T getAsJSONFrom(Map<String, String> attributes, TypeToken<T> type) {
-        return new Gson().fromJson(attributes.get(key), type.getType());
+    public static void set(String attribute, Map<String, String> attributes, Object content) {
+        attributes.put(attribute, gson.toJson(content));
     }
 
-    public void updateAttributesWithJson(Map<String, String> attributes, Object content) {
-        attributes.put(key, gson.toJson(content));
+    public static void set(String attribute, Map<String, String> attributes, String content) {
+        attributes.put(attribute, content);
     }
 
-    public void updateAttributesWithString(Map<String, String> attributes, Object value) {
-        attributes.put(key, String.valueOf(value));
-    }
-
-    public FlowFile updateFlowFile(ProcessSession session, FlowFile flowFile, String value) {
-        return session.putAttribute(flowFile, key, value);
+    public static FlowFile set(String attribute, ProcessSession session, FlowFile flowFile, String content) {
+        return session.putAttribute(flowFile, attribute, content);
     }
 }

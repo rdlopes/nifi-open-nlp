@@ -28,9 +28,9 @@ public class TrainableLemmatizerTest extends TrainableProcessorTest<TrainableLem
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
-        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, new String[]{
+        set(POS_TAGGER_TAGS_LIST_KEY, attributes, new String[]{
                 "NNP", "VBD", "DT", "NN", "VBZ", "IN", "PRP", "TO", "VB", "CD", "JJ", "JJ", "NNS", "IN", "DT", "NNS", "."});
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, new String[]{
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, new String[]{
                 "Rockwell", "said", "the", "agreement", "calls", "for", "it", "to", "supply", "200", "additional", "so-called", "shipsets", "for", "the", "planes", "."});
         testRunner.enqueue("", attributes);
         testRunner.run();
@@ -38,12 +38,11 @@ public class TrainableLemmatizerTest extends TrainableProcessorTest<TrainableLem
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TAGPOS_TAG_LIST.key, attributes.get(TAGPOS_TAG_LIST.key));
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
+        flowFile.assertAttributeEquals(POS_TAGGER_TAGS_LIST_KEY, attributes.get(POS_TAGGER_TAGS_LIST_KEY));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        flowFile.assertAttributeExists(LEMMATIZE_LEMMA_LIST.key);
-
-        List<String> lemmaList = LEMMATIZE_LEMMA_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(LEMMATIZER_LEMMAS_LIST_KEY);
+        List<String> lemmaList = get(LEMMATIZER_LEMMAS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
 
         assertThat(lemmaList).containsExactly(
                 "rockwell", "say", "the", "agreement", "call", "for", "it", "to", "supply", "200", "additional", "so-called", "shipset", "for", "the", "plane", ".");

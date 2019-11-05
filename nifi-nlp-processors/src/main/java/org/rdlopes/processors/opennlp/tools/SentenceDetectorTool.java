@@ -6,7 +6,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.logging.ComponentLog;
 import org.apache.nifi.processor.ProcessContext;
-import org.rdlopes.processors.opennlp.common.NLPAttribute;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 
 public class SentenceDetectorTool extends NLPTool<SentenceModel> {
     public SentenceDetectorTool(Path modelPath, ComponentLog logger) {
@@ -30,8 +30,8 @@ public class SentenceDetectorTool extends NLPTool<SentenceModel> {
         String[] chunks = detector.sentDetect(contentString);
         Span[] chunkAsSpans = detector.sentPosDetect(contentString);
 
-        NLPAttribute.SENTDET_CHUNK_LIST.updateAttributesWithJson(attributes, chunks);
-        NLPAttribute.SENTDET_SPAN_LIST.updateAttributesWithJson(attributes, chunkAsSpans);
+        set(SENTENCE_DETECTOR_SENTENCES_LIST_KEY, evaluation, chunks);
+        set(SENTENCE_DETECTOR_SENTENCES_SPAN_KEY, evaluation, chunkAsSpans);
     }
 
     @Override

@@ -34,19 +34,19 @@ public class TrainableLanguageDetectorTest extends TrainableProcessorTest<Traina
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(LANGDET_PREDICTED_LANGUAGE.key, "pob");
-        flowFile.assertAttributeEquals(LANGDET_CONFIDENCE.key, "0.9999999829939245");
-        flowFile.assertAttributeExists(LANGDET_PROBABLE_LANGUAGE_LIST.key);
-        flowFile.assertAttributeExists(LANGDET_SUPPORTED_LANGUAGE_LIST.key);
+        flowFile.assertAttributeEquals(LANGUAGE_DETECTOR_LANGUAGES_BEST_KEY, "{\"lang\":\"pob\",\"confidence\":0.9999999829939245}");
 
-        List<Language> probableLanguageList = LANGDET_PROBABLE_LANGUAGE_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Language>>() {});
-        assertThat(probableLanguageList).containsExactly(
+        flowFile.assertAttributeExists(LANGUAGE_DETECTOR_LANGUAGES_LIST_KEY);
+        List<Language> languageList = get(LANGUAGE_DETECTOR_LANGUAGES_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<Language>>() {});
+        flowFile.assertAttributeExists(LANGUAGE_DETECTOR_SUPPORTED_LIST_KEY);
+        List<String> supportedLanguageList = get(LANGUAGE_DETECTOR_SUPPORTED_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+
+        assertThat(languageList).containsExactly(
                 new Language("pob", 0.9999999829939245),
                 new Language("ita", 1.7006066448468345E-8),
                 new Language("spa", 9.07907141044455E-15),
                 new Language("fra", 2.315191024434162E-25));
 
-        List<String> supportedLanguageList = LANGDET_SUPPORTED_LANGUAGE_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
         assertThat(supportedLanguageList).containsExactly("pob", "spa", "fra", "ita");
     }
 

@@ -29,20 +29,21 @@ public class PreTrainedDocumentCategorizerTest extends PreTrainedProcessorTest<P
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
-        SENTDET_CHUNK_LIST.updateAttributesWithJson(attributes, singletonList("Have a nice day!"));
+        set(SENTENCE_DETECTOR_SENTENCES_LIST_KEY, attributes, singletonList("Have a nice day!"));
 
         testRunner.enqueue("Have a nice day!", attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeExists(DOCCAT_CATEGORY_LIST.key);
-        flowFile.assertAttributeEquals(DOCCAT_CATEGORY_BEST.key, "1");
-        flowFile.assertAttributeExists(DOCCAT_SCORE_MAP.key);
-        List<String> categoryList = DOCCAT_CATEGORY_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        Map<Double, Set<String>> probabilities = DOCCAT_SCORE_MAP.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<Map<Double, Set<String>>>() {});
+
+        flowFile.assertAttributeExists(DOCUMENT_CATEGORIZER_CATEGORIES_LIST_KEY);
+        List<String> categoryList = get(DOCUMENT_CATEGORIZER_CATEGORIES_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(DOCUMENT_CATEGORIZER_SCORE_MAP_KEY);
+        Map<Double, Set<String>> scoreMap = get(DOCUMENT_CATEGORIZER_SCORE_MAP_KEY, flowFile.getAttributes(), new TypeToken<Map<Double, Set<String>>>() {});
+
         assertThat(categoryList).containsExactlyInAnyOrder("1", "0");
-        assertThat(probabilities).contains(
+        assertThat(scoreMap).contains(
                 entry(0.5123318385650224, singleton("1")),
                 entry(0.4876681614349776, singleton("0")));
     }

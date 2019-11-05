@@ -23,20 +23,19 @@ public class PreTrainedLemmatizerTest extends PreTrainedProcessorTest<PreTrained
     public void shouldLemmatizeOpenNLPExample() {
         testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-lemmatizer.bin").getFile());
         Map<String, String> attributes = new HashMap<>();
-        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, SAMPLE_TAGS_SIMPLE);
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, SAMPLE_TOKENS_SIMPLE);
+        set(POS_TAGGER_TAGS_LIST_KEY, attributes, SAMPLE_TAGS_SIMPLE);
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
         testRunner.enqueue(SAMPLE_CONTENT, attributes);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TAGPOS_TAG_LIST.key, attributes.get(TAGPOS_TAG_LIST.key));
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
+        flowFile.assertAttributeEquals(POS_TAGGER_TAGS_LIST_KEY, attributes.get(POS_TAGGER_TAGS_LIST_KEY));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        flowFile.assertAttributeExists(LEMMATIZE_LEMMA_LIST.key);
-
-        List<String> lemmaList = LEMMATIZE_LEMMA_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(LEMMATIZER_LEMMAS_LIST_KEY);
+        List<String> lemmaList = get(LEMMATIZER_LEMMAS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
 
         assertThat(lemmaList).containsExactly(
                 "==", "please", "notice", "that", "this", "announcement", "will", "be", "update", "at", "10", ":", "30", "am", ",", "3", ":", "00", "pm", "and", "7", ":", "00", "pm", "==", "pierre",

@@ -26,8 +26,8 @@ public class LemmatizerTool extends NLPTool<LemmatizerModel> {
 
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, LemmatizerModel model, Map<String, String> evaluation) {
-        String[] tagsList = TAGPOS_TAG_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
-        String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] tagsList = get(POS_TAGGER_TAGS_LIST_KEY, attributes, new TypeToken<String[]>() {});
+        String[] tokensList = get(TOKENIZER_TOKENS_LIST_KEY, attributes, new TypeToken<String[]>() {});
 
         if (tagsList.length != tokensList.length) {
             throw new IllegalArgumentException("tokens list and tags list need to be of the same length " +
@@ -37,7 +37,7 @@ public class LemmatizerTool extends NLPTool<LemmatizerModel> {
         Lemmatizer lemmatizer = new LemmatizerME(model);
         String[] results = lemmatizer.lemmatize(tokensList, tagsList);
 
-        LEMMATIZE_LEMMA_LIST.updateAttributesWithJson(attributes, results);
+        set(LEMMATIZER_LEMMAS_LIST_KEY, evaluation, results);
     }
 
     @Override

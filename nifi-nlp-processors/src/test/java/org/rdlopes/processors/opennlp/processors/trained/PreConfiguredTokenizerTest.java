@@ -9,8 +9,7 @@ import org.rdlopes.processors.opennlp.common.TokenizerType;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.processors.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
@@ -31,11 +30,11 @@ public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfi
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
 
-        flowFile.assertAttributeExists(TOKENIZE_TOKEN_LIST.key);
-        flowFile.assertAttributeExists(TOKENIZE_SPAN_LIST.key);
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_LIST_KEY);
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_SPAN_KEY);
 
-        List<String> tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        List<Span> tokenSpans = TOKENIZE_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+        List<String> tokensList = get(TOKENIZER_TOKENS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        List<Span> tokenSpans = get(TOKENIZER_TOKENS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
         assertThat(tokensList).containsExactly(
                 "==", "Please", "notice", "that", "this", "announcement", "will", "be", "updated", "at", "10", ":", "30", "AM", ",", "3", ":", "00", "PM", "and", "7", ":", "00", "PM", "==", "Pierre",
@@ -91,11 +90,10 @@ public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfi
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
 
-        flowFile.assertAttributeExists(TOKENIZE_TOKEN_LIST.key);
-        flowFile.assertAttributeExists(TOKENIZE_SPAN_LIST.key);
-
-        List<String> tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        List<Span> tokenSpans = TOKENIZE_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_LIST_KEY);
+        List<String> tokensList = get(TOKENIZER_TOKENS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(TOKENIZER_TOKENS_SPAN_KEY);
+        List<Span> tokenSpans = get(TOKENIZER_TOKENS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
         assertThat(tokensList).containsExactly(
                 "==", "Please", "notice", "that", "this", "announcement", "will", "be", "updated", "at", "10:30", "AM,", "3:00", "PM", "and", "7:00", "PM", "==", "Pierre", "Vinken,", "61", "years",
