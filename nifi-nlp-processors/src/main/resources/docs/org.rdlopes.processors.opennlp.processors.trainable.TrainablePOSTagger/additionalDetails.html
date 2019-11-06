@@ -8,5 +8,59 @@
 </head>
 
 <body>
+
+<h2>TrainablePOSTagger</h2>
+<ul>
+    <li><a href="#training">Training</a></li>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="POSS Tagger flow" src="pos-tagger-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.postagger">OpenNLP POS Tagger</a>.
+    Part of Speech Tagger marks tokens with their corresponding word type based on the token itself and the context of the token.
+    A token might have multiple pos tags depending on the token and the context.
+    The OpenNLP POS Tagger uses a probability model to predict the correct pos tag out of the tag set.
+    To limit the possible tags for a token a tag dictionary can be used which increases the tagging and runtime performance of the tagger.
+    It creates its model from training data provided to the processor via configuration.</p>
+
+<h3 id="training">Training</h3>
+
+<p>The POS Tagger can be trained on annotated training material.
+    The training material is a collection of tokenized sentences where each token has the assigned part-of-speech tag.
+    The native POS Tagger training material looks like this:</p>
+<pre>
+About_IN 10_CD Euro_NNP ,_, I_PRP reckon_VBP ._.
+That_DT sounds_VBZ good_JJ ._.
+</pre>
+<p>Each sentence must be in one line. The token/tag pairs are combined with "_".
+    The token/tag pairs are whitespace separated.
+    The data format does not define a document boundary.
+    If a document boundary should be included in the training material it is suggested to use an empty line.</p>
+<p>Training data is passed either via a file or directly in properties as raw data.
+    In case both properties would be set, then the model would be trained by:</p>
+<ol>
+    <li>training data file first</li>
+    <li>then the training data</li>
+</ol>
+
+
+<h3 id="evaluation">Evaluation</h3>
+<p>TrainablePOSTagger runs against:</p>
+<ul>
+    <li>
+        A tokens list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">TrainableTokenizer</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">PreTrainedTokenizer</a>.
+    </li>
+</ul>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>TrainableParser will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.pos.tagger.tags.list</strong>: the tags list</li>
+</ul>
+
 </body>
 </html>
