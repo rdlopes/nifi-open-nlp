@@ -10,31 +10,34 @@
 <body>
 
 <h2>PreTrainedDocumentCategorizer</h2>
-
-Table of contents:
 <ul>
-    <li><a href="#opennlp">OpenNLP Document Categorizer</a></li>
-    <li><a href="#configuration">Configuration Properties</a></li>
-    <li><a href="#input">Input Data</a></li>
-    <li><a href="#output">Output Data</a></li>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
 </ul>
+<img alt="Document Categorizer flow" src="../org.rdlopes.processors.opennlp.processors.trainable.TrainableDocumentCategorizer/document-categorizer-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat">OpenNLP Document Categorizer</a>.
+    Document Categorizer classifies text by assigning it trained categories, allowing for semantic parsing and sentiment analysis.
+    It loads its model from a file path.</p>
 
+<h3 id="evaluation">Evaluation</h3>
+<p>PreTrainedDocumentCategorizer runs against:</p>
+<ul>
+    <li>
+        A sentences list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableSentenceDetector/additionalDetails.html">TrainableSentenceDetector</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedSentenceDetector/additionalDetails.html">PreTrainedSentenceDetector</a>.
+    </li>
+</ul>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
 
-<h3 id="opennlp">OpenNLP Document Categorizer</h3>
-<p>
-    This processor wraps the evaluation from
-    <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat" target="_blank">
-        OpenNLP Document Categorizer
-    </a>
-    with a pre-trained model.
-</p>
-<p>
-    It classifies text into trained categories, thus allowing for semantic tagging or sentiment analysis.
-</p>
-
-<h3 id="configuration">Configuration Properties</h3>
-<h3 id="input">Input Data</h3>
-<h3 id="output">Output Data</h3>
+<h3 id="output">Output</h3>
+<p>PreTrainedDocumentCategorizer will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.document.categorizer.categories.list</strong>: the categories list</li>
+    <li><strong>nlp.document.categorizer.categories.best</strong>: the category with highest probability</li>
+    <li><strong>nlp.document.categorizer.score.map</strong>: the categories score map, by descending probabilities</li>
+</ul>
 
 </body>
 </html>

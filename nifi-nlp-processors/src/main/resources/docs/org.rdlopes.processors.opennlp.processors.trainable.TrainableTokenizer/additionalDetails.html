@@ -20,10 +20,8 @@
     The OpenNLP Tokenizer segment an input character sequence into tokens.
     Tokens are usually words, punctuation, numbers, etc.
     It creates its model from training data provided to the processor via configuration.</p>
-<p>OpenNLP offers multiple tokenizer implementations:
+<p>This processor implements the following tokenizers:
 <ul>
-    <li>Whitespace Tokenizer - A whitespace tokenizer, non whitespace sequences are identified as tokens</li>
-    <li>Simple Tokenizer - A character class tokenizer, sequences of the same character class are tokens</li>
     <li>Learnable Tokenizer - A maximum entropy tokenizer, detects token boundaries based on probability model</li>
 </ul>
 <p>Most part-of-speech taggers, parsers and so on, work with text tokenized in this manner.
