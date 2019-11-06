@@ -18,8 +18,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_SPAN_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZER_TYPE;
 
 public class TokenizerTool extends NLPTool<TokenizerModel> {
@@ -35,31 +34,17 @@ public class TokenizerTool extends NLPTool<TokenizerModel> {
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, TokenizerModel model, Map<String, String> evaluation)
             throws IOException {
 
-        Tokenizer tokenizer;
-        if (TOKENIZE_TOKENIZER_TYPE.isSetIn(processContext)) {
-            switch (TOKENIZE_TOKENIZER_TYPE.getEnumFrom(processContext, TokenizerType.class)) {
-                case WHITESPACE:
-                    tokenizer = WhitespaceTokenizer.INSTANCE;
-                    break;
-                case SIMPLE:
-                    tokenizer = SimpleTokenizer.INSTANCE;
-                    break;
-                default:
-                    tokenizer = new TokenizerME(model);
-                    break;
-            }
-
-        } else {
-            tokenizer = new TokenizerME(model);
-        }
+        Tokenizer tokenizer = TOKENIZE_TOKENIZER_TYPE.isSetIn(processContext)
+                              ? TOKENIZE_TOKENIZER_TYPE.getEnumFrom(processContext, TokenizerType.class).tokenizer
+                              : new TokenizerME(model);
 
         String contentString = IOUtils.toString(content, charset);
         String normalizedContent = normalizeTokenizedContent(contentString);
         String[] tokensList = tokenizer.tokenize(normalizedContent);
         Span[] tokensAsSpans = tokenizer.tokenizePos(normalizedContent);
 
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, tokensList);
-        TOKENIZE_SPAN_LIST.updateAttributesWithJson(attributes, tokensAsSpans);
+        set(TOKENIZER_TOKENS_LIST_KEY, evaluation, tokensList);
+        set(TOKENIZER_TOKENS_SPAN_KEY, evaluation, tokensAsSpans);
     }
 
     @Override

@@ -4,8 +4,6 @@ import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.junit.Before;
 
-import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
-
 public abstract class NLPProcessorTest<P extends NLPProcessor<?, ?>> {
     private final Class<P> processorClass;
 
@@ -17,10 +15,6 @@ public abstract class NLPProcessorTest<P extends NLPProcessor<?, ?>> {
     public void init() {
         testRunner = TestRunners.newTestRunner(processorClass);
         setupVariables();
-    }
-
-    protected void setModelFilePath(String filePath) {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource(filePath).getFile());
     }
 
     private void setupVariables() {

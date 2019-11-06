@@ -7,6 +7,7 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.processors.TokenizerProcessor;
 import org.rdlopes.processors.opennlp.tools.TokenizerTool;
 
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import static org.rdlopes.processors.opennlp.common.NLPProperty.TOKENIZE_TOKENIZ
 import static org.rdlopes.processors.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 
 @EqualsAndHashCode(callSuper = true)
+@TokenizerProcessor
 public class PreConfiguredTokenizer extends NLPProcessor<TokenizerModel, TokenizerTool> {
 
     @Getter

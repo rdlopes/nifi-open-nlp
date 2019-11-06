@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import opennlp.tools.lemmatizer.LemmatizerModel;
 import org.apache.nifi.components.PropertyDescriptor;
+import org.rdlopes.processors.opennlp.processors.LemmatizerProcessor;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
 import org.rdlopes.processors.opennlp.tools.LemmatizerTool;
 
@@ -16,6 +17,7 @@ import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_SEARCH
 import static org.rdlopes.processors.opennlp.common.NLPProperty.LEMMATIZE_TOPK_MINIMUM_SCORE;
 
 @EqualsAndHashCode(callSuper = true)
+@LemmatizerProcessor
 public class TrainableLemmatizer extends NLPProcessor<LemmatizerModel, LemmatizerTool> {
 
     @Getter

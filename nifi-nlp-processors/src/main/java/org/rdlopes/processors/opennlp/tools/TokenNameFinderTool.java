@@ -25,16 +25,14 @@ public class TokenNameFinderTool extends NLPTool<TokenNameFinderModel> {
 
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, TokenNameFinderModel model, Map<String, String> evaluation) {
-        String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] tokensList = get(TOKENIZER_TOKENS_LIST_KEY, attributes, new TypeToken<String[]>() {});
 
-        NameFinderME nameFinder = new NameFinderME(model);
+        TokenNameFinder nameFinder = new NameFinderME(model);
         Span[] nameSpans = nameFinder.find(tokensList);
         String[] nameList = spansToStrings(nameSpans, tokensList);
-        double[] probabilities = nameFinder.probs();
 
-        NAMEFIND_NAME_LIST.updateAttributesWithJson(attributes, nameList);
-        NAMEFIND_SPAN_LIST.updateAttributesWithJson(attributes, nameSpans);
-        NAMEFIND_PROBABILITIES.updateAttributesWithJson(attributes, probabilities);
+        set(TOKEN_NAME_FINDER_NAMES_LIST_KEY, evaluation, nameList);
+        set(TOKEN_NAME_FINDER_NAMES_SPAN_KEY, evaluation, nameSpans);
     }
 
     @Override

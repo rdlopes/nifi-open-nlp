@@ -23,15 +23,15 @@ public class ChunkerTool extends NLPTool<ChunkerModel> {
 
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, ChunkerModel model, Map<String, String> evaluation) {
-        String[] tagsList = TAGPOS_TAG_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
-        String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] tagsList = get(POS_TAGGER_TAGS_LIST_KEY, attributes, new TypeToken<String[]>() {});
+        String[] tokensList = get(TOKENIZER_TOKENS_LIST_KEY, attributes, new TypeToken<String[]>() {});
 
-        ChunkerME chunker = new ChunkerME(model);
+        Chunker chunker = new ChunkerME(model);
         String[] chunkList = chunker.chunk(tokensList, tagsList);
         Span[] spanList = chunker.chunkAsSpans(tokensList, tagsList);
 
-        CHUNK_CHUNK_LIST.updateAttributesWithJson(evaluation, chunkList);
-        CHUNK_SPAN_LIST.updateAttributesWithJson(evaluation, spanList);
+        set(CHUNKER_CHUNKS_LIST_KEY, evaluation, chunkList);
+        set(CHUNKER_CHUNKS_SPAN_KEY, evaluation, spanList);
     }
 
     @Override

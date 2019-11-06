@@ -17,8 +17,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TAGPOS_TAG_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 
 public class POSTaggerTool extends NLPTool<POSModel> {
     public POSTaggerTool(Path modelPath, ComponentLog logger) {
@@ -27,12 +26,12 @@ public class POSTaggerTool extends NLPTool<POSModel> {
 
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, POSModel model, Map<String, String> evaluation) {
-        String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] tokensList = get(TOKENIZER_TOKENS_LIST_KEY, attributes, new TypeToken<String[]>() {});
 
         POSTagger tagger = new POSTaggerME(model);
         String[] tagsList = tagger.tag(tokensList);
 
-        TAGPOS_TAG_LIST.updateAttributesWithJson(attributes, tagsList);
+        set(POS_TAGGER_TAGS_LIST_KEY, evaluation, tagsList);
     }
 
     @Override

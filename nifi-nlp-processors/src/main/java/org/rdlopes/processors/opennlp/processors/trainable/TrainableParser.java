@@ -5,6 +5,7 @@ import lombok.Getter;
 import opennlp.tools.parser.ParserModel;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
+import org.rdlopes.processors.opennlp.processors.ParserProcessor;
 import org.rdlopes.processors.opennlp.tools.ParserTool;
 
 import java.nio.file.Path;
@@ -15,6 +16,7 @@ import static java.util.stream.Collectors.toList;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
 @EqualsAndHashCode(callSuper = true)
+@ParserProcessor
 public class TrainableParser extends NLPProcessor<ParserModel, ParserTool> {
 
     @Getter

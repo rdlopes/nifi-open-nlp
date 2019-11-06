@@ -3,10 +3,32 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>TrainedLanguageDetector</title>
+    <title>PreTrainedLanguageDetector</title>
     <link href="/nifi-docs/css/component-usage.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
+
+<h2>PreTrainedLanguageDetector</h2>
+<ul>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="Language Detector flow" src="../org.rdlopes.processors.opennlp.processors.trainable.TrainableLanguageDetector/language-detector-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.langdetect">OpenNLP Language Detector</a>.
+    Language Detector parses text to yield the closest language trained matching the content.
+    It loads its model from a file path.</p>
+
+<h3 id="evaluation">Evaluation</h3>
+<p>PreTrainedLanguageDetector runs against full text, meaning it will read the flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>PreTrainedLanguageDetector will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.language.detector.languages.list</strong>: the languages list</li>
+    <li><strong>nlp.language.detector.languages.best</strong>: the language with highest probability</li>
+    <li><strong>nlp.language.detector.supported.list</strong>: the list of supported languages</li>
+</ul>
+
 </body>
 </html>

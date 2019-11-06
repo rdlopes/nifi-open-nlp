@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>TrainableNameFinder</title>
+    <link href="/nifi-docs/css/component-usage.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+
+<h2>TrainableNameFinder</h2>
+<ul>
+    <li><a href="#training">Training</a></li>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="Token NName Finder flow" src="token-name-finder-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.namefind">OpenNLP Name Finder</a>.
+    The Name Finder can detect named entities and numbers in text.
+    To be able to detect entities the Name Finder needs a model.
+    The model is dependent on the language and entity type it was trained for.
+    The OpenNLP projects offers a number of pre-trained name finder models which are trained on various freely available corpora.
+    They can be downloaded at our model download page. To find names in raw text the text must be segmented into tokens and sentences.
+    It is important that the tokenization for the training data and the input text is identical.
+    It creates its model from training data provided to the processor via configuration.</p>
+
+<h3 id="training">Training</h3>
+<p>The training data must be provided in Open NLP proprietary format.
+    This is one sentence per line.
+    Some other formats are available as well.
+    The sentence must be tokenized and contain spans which mark the entities.
+    Documents are separated by empty lines which trigger the reset of the adaptive feature generators.
+    A training file can contain multiple types.
+    If the training file contains multiple types the created model will also be able to detect these multiple types.</p>
+<p>Sample sentence of the data:</p>
+<pre>
+&lt;START:person&gt; Pierre Vinken &lt;END&gt; , 61 years old , will join the board as a nonexecutive director Nov. 29 .
+Mr . &lt;START:person&gt; Vinken &lt;END&gt; is chairman of Elsevier N.V. , the Dutch publishing group .
+</pre>
+<p>The training data should contain at least 15000 sentences to create a model which performs well.</p>
+<p>Training data is passed either via a file or directly in properties as raw data.
+    In case both properties would be set, then the model would be trained by:</p>
+<ol>
+    <li>training data file first</li>
+    <li>then the training data</li>
+</ol>
+
+
+<h3 id="evaluation">Evaluation</h3>
+<p>TrainableNameFinder runs against:</p>
+<ul>
+    <li>
+        A tokens list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">TrainableTokenizer</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">PreTrainedTokenizer</a>.
+    </li>
+</ul>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>TrainableNameFinder will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.token.name.finder.names.list</strong>: the names list</li>
+    <li><strong>nlp.token.name.finder.names.span</strong>: the names spans</li>
+</ul>
+
+</body>
+</html>

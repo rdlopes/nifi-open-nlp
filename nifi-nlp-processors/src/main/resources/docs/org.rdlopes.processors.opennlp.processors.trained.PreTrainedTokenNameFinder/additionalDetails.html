@@ -3,10 +3,45 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>TrainedNameFinder</title>
+    <title>PreTrainedTokenNameFinder</title>
     <link href="/nifi-docs/css/component-usage.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
+
+<h2>PreTrainedTokenNameFinder</h2>
+<ul>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="Token NName Finder flow" src="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenNameFinder/token-name-finder-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.namefind">OpenNLP Name Finder</a>.
+    The Name Finder can detect named entities and numbers in text.
+    To be able to detect entities the Name Finder needs a model.
+    The model is dependent on the language and entity type it was trained for.
+    The OpenNLP projects offers a number of pre-trained name finder models which are trained on various freely available corpora.
+    They can be downloaded at our model download page. To find names in raw text the text must be segmented into tokens and sentences.
+    It is important that the tokenization for the training data and the input text is identical.
+    It loads its model from a file path.</p>
+
+<h3 id="evaluation">Evaluation</h3>
+<p>PreTrainedTokenNameFinder runs against:</p>
+<ul>
+    <li>
+        A tokens list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">TrainableTokenizer</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">PreTrainedTokenizer</a>.
+    </li>
+</ul>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>PreTrainedTokenNameFinder will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.token.name.finder.names.list</strong>: the names list</li>
+    <li><strong>nlp.token.name.finder.names.span</strong>: the names spans</li>
+</ul>
+
 </body>
 </html>

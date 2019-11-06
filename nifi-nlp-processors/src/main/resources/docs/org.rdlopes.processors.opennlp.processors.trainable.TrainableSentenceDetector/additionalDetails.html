@@ -8,5 +8,49 @@
 </head>
 
 <body>
+
+<h2>TrainableSentenceDetector</h2>
+<ul>
+    <li><a href="#training">Training</a></li>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="Sentence Detector flow" src="sentence-detector-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.sentdetect">OpenNLP Sentence Detector</a>.
+    The OpenNLP Sentence Detector can detect that a punctuation character marks the end of a sentence or not.
+    In this sense a sentence is defined as the longest white space trimmed character sequence between two punctuation marks.
+    The first and last sentence make an exception to this rule.
+    The first non whitespace character is assumed to be the begin of a sentence, and the last non whitespace character is assumed to be a sentence end.
+    It creates its model from training data provided to the processor via configuration.</p>
+
+<h3 id="training">Training</h3>
+<p>TrainableSentenceDetector takes training data in in a proprietary format.
+    Which is one sentence per line.
+    An empty line indicates a document boundary.
+    In case the document boundary is unknown, its recommended to have an empty line every few ten sentences.
+    Here is a sample format:</p>
+<pre>
+Pierre Vinken, 61 years old, will join the board as a nonexecutive director Nov. 29. Mr. Vinken is
+chairman of Elsevier N.V., the Dutch publishing group. Rudolph Agnew, 55 years
+old and former chairman of Consolidated Gold Fields PLC, was named a director of this
+British industrial conglomerate.
+</pre>
+<p>Training data is passed either via a file or directly in properties as raw data.
+    In case both properties would be set, then the model would be trained by:</p>
+<ol>
+    <li>training data file first</li>
+    <li>then the training data</li>
+</ol>
+
+<h3 id="evaluation">Evaluation</h3>
+<p>TrainableSentenceDetector runs against full text, meaning it will read the flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>TrainableSentenceDetector will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.sentence.detector.sentences.list</strong>: the sentences list</li>
+    <li><strong>nlp.sentence.detector.sentences.span</strong>: the sentences spans</li>
+</ul>
+
 </body>
 </html>

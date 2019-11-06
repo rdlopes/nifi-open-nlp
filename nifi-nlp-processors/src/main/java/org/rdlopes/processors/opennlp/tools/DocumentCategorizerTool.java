@@ -31,7 +31,7 @@ public class DocumentCategorizerTool extends NLPTool<DoccatModel> {
     @Override
     protected void evaluate(ProcessContext processContext, InputStream content, Charset charset, Map<String, String> attributes, DoccatModel model, Map<String, String> evaluation) {
         DocumentCategorizer documentCategorizer = new DocumentCategorizerME(model);
-        String[] sentencesList = SENTDET_CHUNK_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] sentencesList = get(SENTENCE_DETECTOR_SENTENCES_LIST_KEY, attributes, new TypeToken<String[]>() {});
         double[] results = documentCategorizer.categorize(sentencesList);
 
         String bestCategory = documentCategorizer.getBestCategory(results);
@@ -39,11 +39,11 @@ public class DocumentCategorizerTool extends NLPTool<DoccatModel> {
                                              .sequential()
                                              .mapToObj(documentCategorizer::getCategory)
                                              .collect(toList());
-        Map<Double, Set<String>> probabilities = documentCategorizer.sortedScoreMap(sentencesList);
+        Map<Double, Set<String>> scoreMap = documentCategorizer.sortedScoreMap(sentencesList);
 
-        DOCCAT_CATEGORY_LIST.updateAttributesWithJson(attributes, categoryList);
-        DOCCAT_CATEGORY_BEST.updateAttributesWithString(attributes, bestCategory);
-        DOCCAT_SCORE_MAP.updateAttributesWithJson(attributes, probabilities);
+        set(DOCUMENT_CATEGORIZER_CATEGORIES_LIST_KEY, evaluation, categoryList);
+        set(DOCUMENT_CATEGORIZER_CATEGORIES_BEST_KEY, evaluation, bestCategory);
+        set(DOCUMENT_CATEGORIZER_SCORE_MAP_KEY, evaluation, scoreMap);
     }
 
     @Override

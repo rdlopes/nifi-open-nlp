@@ -49,6 +49,7 @@ A new NiFi folder exists under `$NIFI_HOME/models` that contains the pre-trained
 models for English language:
 
 * `en-chunker.bin`
+* `en-doccat-tweets.bin`
 * `en-ner-date.bin`
 * `en-ner-location.bin`
 * `en-ner-money.bin`

@@ -25,8 +25,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.READ;
 import static java.util.stream.Collectors.toList;
 import static opennlp.tools.parser.ParserType.TREEINSERT;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.PARSER_PARSE_LIST;
-import static org.rdlopes.processors.opennlp.common.NLPAttribute.TOKENIZE_TOKEN_LIST;
+import static org.rdlopes.processors.opennlp.common.NLPAttribute.*;
 import static org.rdlopes.processors.opennlp.common.NLPProperty.*;
 
 public class ParserTool extends NLPTool<ParserModel> {
@@ -64,7 +63,7 @@ public class ParserTool extends NLPTool<ParserModel> {
         int numParses = PARSER_PARSES_COUNT.getIntFrom(processContext);
         int beamSize = PARSER_BEAM_SIZE.getIntFrom(processContext);
         double advancePercentage = PARSER_ADVANCE_PERCENTAGE.getDoubleFrom(processContext);
-        String[] tokensList = TOKENIZE_TOKEN_LIST.getAsJSONFrom(attributes, new TypeToken<String[]>() {});
+        String[] tokensList = get(TOKENIZER_TOKENS_LIST_KEY, attributes, new TypeToken<String[]>() {});
 
         Parser parser = ParserFactory.create(model, beamSize, advancePercentage);
         Parse[] parses = parser.parse(createParseSource(Arrays.asList(tokensList)), numParses);
@@ -75,7 +74,7 @@ public class ParserTool extends NLPTool<ParserModel> {
             return builder.toString();
         }).collect(toList());
 
-        PARSER_PARSE_LIST.updateAttributesWithJson(attributes, parseCollection);
+        set(PARSER_PARSES_LIST_KEY, evaluation, parseCollection);
     }
 
     @Override

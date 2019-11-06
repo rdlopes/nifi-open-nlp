@@ -3,10 +3,44 @@
 
 <head>
     <meta charset="utf-8"/>
-    <title>TrainedLemmatizer</title>
+    <title>PreTrainedLemmatizer</title>
     <link href="/nifi-docs/css/component-usage.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
+
+<h2>PreTrainedLemmatizer</h2>
+<ul>
+    <li><a href="#evaluation">Evaluation</a></li>
+    <li><a href="#output">Output</a></li>
+</ul>
+<img alt="Lemmatizer flow" src="../org.rdlopes.processors.opennlp.processors.trainable.TrainableLemmatizer/lemmatizer-flow.png">
+<p>This processor wraps the evaluation from <a href="https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.lemmatizer">OpenNLP Lemmatizer</a>.
+    Lemmatizer replaces tags and tokens into a dictionary of lemmas, allowing for grammatical analysis.
+    It loads its model from a file path.</p>
+
+<h3 id="evaluation">Evaluation</h3>
+<p>PreTrainedLemmatizer runs against:</p>
+<ul>
+    <li>
+        A tokens list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainableTokenizer/additionalDetails.html">TrainableTokenizer</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedTokenizer/additionalDetails.html">PreTrainedTokenizer</a>.
+    </li>
+    <li>
+        A tags list, as produced by a
+        <a href="../org.rdlopes.processors.opennlp.processors.trainable.TrainablePOSTagger/additionalDetails.html">TrainablePOSTagger</a>
+        or a <a href="../org.rdlopes.processors.opennlp.processors.trained.PreTrainedPOSTagger/additionalDetails.html">PreTrainedPOSTagger</a>.
+    </li>
+</ul>
+<p>Input is read directly from flow file attributes, allowing to chain the processors.</p>
+<p>Since all data required by the processor lies in the attributes, the processor will not open flow file content.</p>
+
+<h3 id="output">Output</h3>
+<p>PreTrainedLemmatizer will enrich flow file attributes with</p>
+<ul>
+    <li><strong>nlp.lemmatizer.lemmas.list</strong>: the lemmas list</li>
+</ul>
+
 </body>
 </html>

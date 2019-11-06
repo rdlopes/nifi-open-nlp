@@ -31,14 +31,12 @@ public class LanguageDetectorTool extends NLPTool<LanguageDetectorModel> {
         String contentString = IOUtils.toString(content, charset);
 
         Language predictedLanguage = languageDetector.predictLanguage(contentString);
-        LANGDET_PREDICTED_LANGUAGE.updateAttributesWithString(attributes, predictedLanguage.getLang());
-        LANGDET_CONFIDENCE.updateAttributesWithString(attributes, predictedLanguage.getConfidence());
-
         Language[] probableLanguageList = languageDetector.predictLanguages(contentString);
-        LANGDET_PROBABLE_LANGUAGE_LIST.updateAttributesWithJson(attributes, probableLanguageList);
-
         String[] supportedLanguages = languageDetector.getSupportedLanguages();
-        LANGDET_SUPPORTED_LANGUAGE_LIST.updateAttributesWithJson(attributes, supportedLanguages);
+
+        set(LANGUAGE_DETECTOR_LANGUAGES_LIST_KEY, evaluation, probableLanguageList);
+        set(LANGUAGE_DETECTOR_LANGUAGES_BEST_KEY, evaluation, predictedLanguage);
+        set(LANGUAGE_DETECTOR_SUPPORTED_LIST_KEY, evaluation, supportedLanguages);
     }
 
     @Override

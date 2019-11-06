@@ -26,13 +26,12 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
                                         String[] tokens,
                                         String data,
                                         Consumer<List<String>> nameListAssertion,
-                                        Consumer<List<Span>> spanListAssertion,
-                                        Consumer<List<Double>> probabilitiesAssertion) {
+                                        Consumer<List<Span>> spanListAssertion) {
         testRunner.setProperty(NAMEFIND_NAME_TYPE.descriptor, nameType);
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
-        TOKENIZE_TOKEN_LIST.updateAttributesWithJson(attributes, tokens);
+        set(TOKENIZER_TOKENS_LIST_KEY, attributes, tokens);
 
         testRunner.enqueue(data, attributes);
         testRunner.run();
@@ -40,20 +39,15 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
         testRunner.assertTransferCount(RELATIONSHIP_SUCCESS, 1);
 
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
-        flowFile.assertAttributeEquals(TAGPOS_TAG_LIST.key, attributes.get(TAGPOS_TAG_LIST.key));
-        flowFile.assertAttributeEquals(TOKENIZE_TOKEN_LIST.key, attributes.get(TOKENIZE_TOKEN_LIST.key));
+        flowFile.assertAttributeEquals(TOKENIZER_TOKENS_LIST_KEY, attributes.get(TOKENIZER_TOKENS_LIST_KEY));
 
-        flowFile.assertAttributeExists(NAMEFIND_NAME_LIST.key);
-        flowFile.assertAttributeExists(NAMEFIND_SPAN_LIST.key);
-        flowFile.assertAttributeExists(NAMEFIND_PROBABILITIES.key);
-
-        List<String> nameList = NAMEFIND_NAME_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<String>>() {});
-        List<Span> nameSpans = NAMEFIND_SPAN_LIST.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Span>>() {});
-        List<Double> probabilities = NAMEFIND_PROBABILITIES.getAsJSONFrom(flowFile.getAttributes(), new TypeToken<List<Double>>() {});
+        flowFile.assertAttributeExists(TOKEN_NAME_FINDER_NAMES_LIST_KEY);
+        List<String> nameList = get(TOKEN_NAME_FINDER_NAMES_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        flowFile.assertAttributeExists(TOKEN_NAME_FINDER_NAMES_SPAN_KEY);
+        List<Span> nameSpans = get(TOKEN_NAME_FINDER_NAMES_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
 
         nameListAssertion.accept(nameList);
         spanListAssertion.accept(nameSpans);
-        probabilitiesAssertion.accept(probabilities);
     }
 
     @Test
@@ -65,10 +59,7 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
                                new String[]{"Hi", "Mike", ",", "it's", "Stefanie", "Schmidt", "."},
                                "",
                                names -> assertThat(names).containsExactly("Mike", "Stefanie Schmidt"),
-                               spans -> assertThat(spans).containsExactly(new Span(1, 2, "default"), new Span(4, 6, "default")),
-                               probabilities -> assertThat(probabilities).containsExactly(
-                                       0.9357052060330299, 0.9629181679586647, 0.987971659893104, 0.9949441347953653,
-                                       0.9623310796558195, 0.9616806156295147, 0.9875749552188686));
+                               spans -> assertThat(spans).containsExactly(new Span(1, 2, "default"), new Span(4, 6, "default")));
     }
 
 }
