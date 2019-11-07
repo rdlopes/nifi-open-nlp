@@ -10,7 +10,7 @@
 
     <groupId>org.rdlopes</groupId>
     <artifactId>nifi-open-nlp</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -57,7 +57,7 @@
         <url>https://github.com/rdlopes/nifi-open-nlp</url>
         <connection>scm:git:git://github.com/rdlopes/nifi-open-nlp.git</connection>
         <developerConnection>scm:git:git@github.com:rdlopes/nifi-open-nlp.git</developerConnection>
-      <tag>nifi-open-nlp-0.0.1</tag>
+      <tag>nifi-open-nlp-0.0.2</tag>
   </scm>
 
     <dependencyManagement>
