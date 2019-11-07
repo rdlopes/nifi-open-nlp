@@ -17,7 +17,7 @@ jobs:
           java-version: 1.8
 
       - name: Clean with Maven
-        run: mvn -B sonar:sonar --file pom.xml
+        run: mvn -B clean --file pom.xml
 
       - name: Install with Maven
         run: mvn -B install --file pom.xml
