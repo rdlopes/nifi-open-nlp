@@ -29,6 +29,11 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
+    <organization>
+        <name>rdlopes</name>
+        <url>https://github.com/rdlopes</url>
+    </organization>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
