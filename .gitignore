@@ -9,3 +9,7 @@
 
 ### Docker ###
 nifi-local-data/conf/archive/
+nifi-local-data/model-store/
+
+### OS ###
+**/.DS_Store
