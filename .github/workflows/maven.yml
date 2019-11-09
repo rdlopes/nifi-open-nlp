@@ -33,3 +33,5 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: nifi-nlp-nar/target/nifi-nlp-nar-*.nar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
