@@ -29,8 +29,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
 
       - name: Deploy
-        run: mvn -B deploy -Dregistry=https://maven.pkg.github.com/phanatic -Dtoken=$GITHUB_TOKEN -f pom.xml
-        if: startsWith(github.ref, 'refs/tags/')
+        run: mvn -B deploy:deploy -Dregistry=https://maven.pkg.github.com/rdlopes/nifi-open-nlp -Dtoken=$GITHUB_TOKEN -f pom.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
