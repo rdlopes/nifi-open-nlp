@@ -1,6 +1,7 @@
 # nifi-open-nlp
 
-[![Actions Status](https://github.com/rdlopes/nifi-open-nlp/workflows/ci/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
+[![Build Status](https://github.com/rdlopes/nifi-open-nlp/workflows/build/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
+[![Deploy Status](https://github.com/rdlopes/nifi-open-nlp/workflows/deploy/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
 
 A set of [NiFi](https://nifi.apache.org) processors implementing [Apache OpenNLP](https://opennlp.apache.org/) engine tools.
 

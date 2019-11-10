@@ -1,4 +1,4 @@
-name: cd
+name: deploy
 
 on:
   push:
@@ -37,10 +37,16 @@ jobs:
       - name: Checkout SCM
         uses: actions/checkout@v1
 
-      - name: Push container image to Docker
+      - name: Build Docker image
         run: |
-          docker login docker.pkg.github.com --username rdlopes --password "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
+          docker login docker.pkg.github.com -u rdlopes -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
           docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
+        env:
+          GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}
+
+      - name: Push Docker image
+        run: |
+          docker login docker.pkg.github.com -u rdlopes -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
           docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
         env:
           GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}
