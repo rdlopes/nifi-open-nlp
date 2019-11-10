@@ -126,6 +126,7 @@
                     <version>2.5.3</version>
                     <configuration>
                         <goals>install:install deploy:deploy</goals>
+                        <tag>v${project.version}</tag>
                     </configuration>
                 </plugin>
                 <plugin>
