@@ -37,7 +37,7 @@ jobs:
       - name: Push container image to Docker
         run: |
           docker login docker.pkg.github.com --username rdlopes --password "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
-          docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:latest .
+          docker build --squash -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:latest .
           docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:latest
         env:
           GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}

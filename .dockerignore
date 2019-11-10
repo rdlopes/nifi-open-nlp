@@ -3,3 +3,5 @@
 .travis.yml
 README.md
 target
+nifi-local-data
+.github
