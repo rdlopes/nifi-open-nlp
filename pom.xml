@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -29,8 +30,8 @@
         <connection>scm:git:git://git@github.com/rdlopes/nifi-open-nlp.git</connection>
         <developerConnection>scm:git:https://github.com/rdlopes/nifi-open-nlp.git</developerConnection>
         <url>https://github.com/rdlopes/nifi-open-nlp</url>
-      <tag>nifi-open-nlp-0.0.14</tag>
-  </scm>
+        <tag>nifi-open-nlp-0.0.14</tag>
+    </scm>
 
     <issueManagement>
         <system>github</system>
@@ -116,28 +117,6 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <skip>${maven.javadoc.skip}</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <configuration>
-                        <skipSource>${maven.source.skip}</skipSource>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.2</version>
                 </plugin>
@@ -146,8 +125,8 @@
                     <artifactId>maven-release-plugin</artifactId>
                     <version>2.5.3</version>
                     <configuration>
-                        <goals>install deploy:deploy</goals>
                         <tag>v${project.version}</tag>
+                        <pushChanges>false</pushChanges>
                     </configuration>
                 </plugin>
                 <plugin>
