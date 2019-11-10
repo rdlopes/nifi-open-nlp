@@ -32,7 +32,7 @@
     <servers>
         <server>
             <id>github</id>
-            <username>x-access-token</username>
+            <username>rdlopes</username>
             <password>${secrets.GITHUB_TOKEN}</password>
         </server>
     </servers>
