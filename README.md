@@ -1,6 +1,6 @@
 # nifi-open-nlp
-[![Build Status](https://travis-ci.org/rdlopes/nifi-open-nlp.svg?branch=master)](https://travis-ci.org/rdlopes/nifi-open-nlp)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=org.rdlopes%3Anifi-open-nlp&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.rdlopes%3Anifi-open-nlp)
+[![Actions Status](https://github.com/rdlopes/nifi-open-nlp/workflows/ci/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
+[![Actions Status](https://github.com/rdlopes/nifi-open-nlp/workflows/cd/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
 
 A set of [NiFi](https://nifi.apache.org) processors implementing [Apache OpenNLP](https://opennlp.apache.org/) engine tools.
 
