@@ -10,7 +10,7 @@
 
     <groupId>org.rdlopes</groupId>
     <artifactId>nifi-open-nlp</artifactId>
-    <version>0.0.14</version>
+    <version>0.0.14-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
