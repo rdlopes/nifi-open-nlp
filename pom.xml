@@ -125,7 +125,6 @@
                     <version>2.5.3</version>
                     <configuration>
                         <tag>v${project.version}</tag>
-                        <pushChanges>false</pushChanges>
                     </configuration>
                 </plugin>
                 <plugin>
