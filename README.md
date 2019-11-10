@@ -92,7 +92,7 @@ To use nifi-nlp-nar as a Maven dependency, add
     <dependency>
       <groupId>org.rdlopes</groupId>
       <artifactId>nifi-nlp-nar</artifactId>
-      <version>0.0.18</version>
+      <version>${nifi-open-nlp.version}</version>
     </dependency>
 
 to your `<dependencies>` section, and add the following repository
