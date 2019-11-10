@@ -48,9 +48,6 @@
         </snapshotRepository>
     </distributionManagement>
 
-    <mailingLists>
-    </mailingLists>
-
     <properties>
         <nifi.version>1.9.2</nifi.version>
         <opennlp.version>1.9.1</opennlp.version>
@@ -64,6 +61,8 @@
         <sonar.organization>${project.organization.name}</sonar.organization>
         <!-- github -->
         <github.deploy.url>https://maven.pkg.github.com/${project.organization.name}/nifi-open-nlp</github.deploy.url>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <maven.source.skip>false</maven.source.skip>
     </properties>
 
     <dependencyManagement>
@@ -115,6 +114,20 @@
         <finalName>${project.artifactId}</finalName>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <skip>${maven.javadoc.skip}</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <configuration>
+                        <skipSource>${maven.source.skip}</skipSource>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
