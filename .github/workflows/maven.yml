@@ -28,8 +28,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
 
-      - name: Deploy
-        run: mvn -B deploy:deploy -Dregistry=https://maven.pkg.github.com/rdlopes/nifi-open-nlp -Dtoken=$GITHUB_TOKEN -f pom.xml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-
