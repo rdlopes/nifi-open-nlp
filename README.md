@@ -78,6 +78,20 @@ The rationale is that processors can be trained using both model files, training
 but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
 training/evaluation will be explained further.
 
+## Importing as a maven dependency
+
+[GitHub package registry](https://github.com/features/package-registry) has kicked in as a beta.
+
+Packages are now available to download as Maven dependencies. Just add
+
+    <dependency>
+      <groupId>org.rdlopes</groupId>
+      <artifactId>nifi-nlp-nar</artifactId>
+      <version>0.0.18</version>
+    </dependency>
+
+to your POM and you should have the nar present in your local repo.
+
 ## Apache NLP tools
 
 Following tools listed in the 
