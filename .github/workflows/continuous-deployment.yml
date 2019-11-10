@@ -1,0 +1,60 @@
+name: continuous-deployment
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+
+  maven:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout SCM
+        uses: actions/checkout@v1
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Package with Maven
+        run: mvn -B clean package
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: nifi-nlp-nar/target/nifi-nlp-nar.nar
+          asset_name: nifi-nlp-nar.nar
+          asset_content_type: application/java-archive
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout SCM
+        uses: actions/checkout@v1
+
+      - name: Build & Push Docker image @ ${{ github.ref }}
+        run: |
+          docker login docker.pkg.github.com -u rdlopes -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
+          docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ github.ref }} .
+          docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ github.ref }}
+        env:
+          GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}
