@@ -78,11 +78,16 @@ The rationale is that processors can be trained using both model files, training
 but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
 training/evaluation will be explained further.
 
-## Importing as a maven dependency
+## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
 
-[GitHub package registry](https://github.com/features/package-registry) has kicked in as a beta.
+Now that the beta has kicked in, project can be used as:
 
-Packages are now available to download as Maven dependencies. Just add
+* a Maven dependency, declaring reference in POM
+* a Docker container, pulling image from GitHub registry
+
+### As a maven dependency
+
+To use nifi-nlp-nar as a Maven dependency, add
 
     <dependency>
       <groupId>org.rdlopes</groupId>
@@ -90,7 +95,27 @@ Packages are now available to download as Maven dependencies. Just add
       <version>0.0.18</version>
     </dependency>
 
-to your POM and you should have the nar present in your local repo.
+to your `<dependencies>` section, and add the following repository
+
+    <repository>
+        <id>github</id>
+        <name>GitHub rdlopes Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/rdlopes</url>
+    </repository>
+
+to your `<repositories>` section, then you should have the nar present in your local repo.
+
+### As a Docker container
+
+Use the following command
+
+    docker pull docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
+    
+to start the container, or
+
+    FROM docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
+    
+in your Dockerfile to derive from this project's Dockerfile.
 
 ## Apache NLP tools
 
