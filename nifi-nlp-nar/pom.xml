@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.rdlopes</groupId>
         <artifactId>nifi-open-nlp</artifactId>
-        <version>0.0.12-SNAPSHOT</version>
+        <version>0.0.13-SNAPSHOT</version>
     </parent>
 
     <artifactId>nifi-nlp-nar</artifactId>
@@ -23,5 +23,22 @@
             <artifactId>nifi-nlp-processors</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <goals>deploy:deploy</goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
