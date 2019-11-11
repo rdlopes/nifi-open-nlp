@@ -21,11 +21,11 @@ jobs:
 
       - name: Deploy package with Maven
         run: >
-        mvn --settings settings.xml -B clean install deploy:deploy-file
-        -Durl=https://maven.pkg.github.com/rdlopes/nifi-open-nlp
-        -DrepositoryId=github
-        -Dfile=nifi-nlp-nar/target/nifi-nlp-nar.nar
-        -DpomFile=nifi-nlp-nar/pom.xml
+          mvn --settings settings.xml -B clean install deploy:deploy-file
+          -Durl=https://maven.pkg.github.com/rdlopes/nifi-open-nlp
+          -DrepositoryId=github
+          -Dfile=nifi-nlp-nar/target/nifi-nlp-nar.nar
+          -DpomFile=nifi-nlp-nar/pom.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
