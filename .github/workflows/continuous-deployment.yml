@@ -33,13 +33,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
       - name: Checkout SCM
         uses: actions/checkout@v1
 
       - name: Build & Push Docker image @ ${{ github.ref }}
         run: |
           docker login docker.pkg.github.com -u rdlopes -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
-          docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ github.ref }} .
-          docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ github.ref }}
+          docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
+          docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
         env:
           GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}
