@@ -46,7 +46,7 @@ jobs:
         run: docker build -t "$DOCKER_IMAGE":${{ steps.get_version.outputs.VERSION }} .
 
       - name: docker login
-        run: echo "$GITHUB_TOKEN" | docker login -u "$DOCKER_LOGIN" --password-stdin "$DOCKER_REGISTRY"
+        run: echo "$GITHUB_TOKEN" | docker login -username "$DOCKER_LOGIN" --password-stdin "$DOCKER_REGISTRY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
