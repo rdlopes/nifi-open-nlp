@@ -2,8 +2,7 @@ name: continuous-deployment
 
 on:
   push:
-    tags:
-      - v*
+    tags: []
 
 jobs:
 
