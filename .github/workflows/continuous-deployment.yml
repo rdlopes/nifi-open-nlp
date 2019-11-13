@@ -47,6 +47,4 @@ jobs:
 
       - name: docker push ${{ steps.get_version.outputs.VERSION }}
         if: success()
-        uses: actions-hub/docker@master
-        with:
-          args: push docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
+        run: docker push docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}

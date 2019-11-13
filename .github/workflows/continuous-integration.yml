@@ -44,6 +44,4 @@ jobs:
 
       - name: docker push latest
         if: success()
-        uses: actions-hub/docker@master
-        with:
-          args: push docker.pkg.github.com/${{ github.repository }}/nifi:latest
+        run: docker push docker.pkg.github.com/${{ github.repository }}/nifi:latest
