@@ -25,7 +25,8 @@ jobs:
           -Durl=https://maven.pkg.github.com/rdlopes/nifi-open-nlp
           -DrepositoryId=github
           -Dfile=nifi-nlp-nar/target/nifi-nlp-nar.nar
-          -DpomFile=nifi-nlp-nar/pom.xml || true
+          -DpomFile=nifi-nlp-nar/pom.xml
+          || 0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
