@@ -40,10 +40,10 @@ jobs:
 
       - name: docker build latest
         if: success()
-        run: docker build -t docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi .
+        run: docker build -t docker.pkg.github.com/${{ github.repository }}/nifi .
 
       - name: docker push latest
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi || ${{ true }}
+          args: push build docker.pkg.github.com/${{ github.repository }}/nifi || ${{ true }}
