@@ -3,7 +3,7 @@ name: continuous-deployment
 on:
   push:
     tags:
-      - *
+      - '*'
 
 jobs:
 
