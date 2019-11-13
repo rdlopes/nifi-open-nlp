@@ -44,14 +44,10 @@ jobs:
 
       - name: docker build ${{ steps.get_version.outputs.VERSION }}
         if: success()
-        run: docker build -t ${{ TAG }} .
-        env:
-          TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
+        run: docker build -t build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }} .
 
       - name: docker push ${{ steps.get_version.outputs.VERSION }}
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push ${{ TAG }} || ${{ true }}
-        env:
-          TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
+          args: push build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }} || ${{ true }}
