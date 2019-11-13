@@ -41,8 +41,9 @@ jobs:
         uses: actions/checkout@v1
 
       - name: docker build
-        uses: actions/docker/cli@master
-        args: build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
+        run: actions/docker/cli@master
+        args:
+          - build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
 
       - name: docker login
         uses: actions/docker/login@master
@@ -53,4 +54,5 @@ jobs:
 
       - name: docker push
         uses: actions/docker/cli@master
-        args: push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
+        args:
+          - push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
