@@ -42,13 +42,13 @@ jobs:
           DOCKER_USERNAME: ${{ github.actor }}
           DOCKER_PASSWORD: ${{ secrets.LOCAL_TOKEN }}
 
-      - name: docker build ${{ TAG }}
+      - name: docker build ${{ steps.get_version.outputs.VERSION }}
         if: success()
         run: docker build -t ${{ TAG }} .
         env:
           TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
 
-      - name: docker push ${{ TAG }}
+      - name: docker push ${{ steps.get_version.outputs.VERSION }}
         if: success()
         uses: actions-hub/docker@master
         with:

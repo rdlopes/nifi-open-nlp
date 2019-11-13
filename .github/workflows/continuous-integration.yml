@@ -38,13 +38,13 @@ jobs:
           DOCKER_USERNAME: ${{ github.actor }}
           DOCKER_PASSWORD: ${{ secrets.LOCAL_TOKEN }}
 
-      - name: docker build ${{ TAG }}
+      - name: docker build latest
         if: success()
         run: docker build -t ${{ TAG }} .
         env:
           TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi
 
-      - name: docker push ${{ TAG }}
+      - name: docker push latest
         if: success()
         uses: actions-hub/docker@master
         with:
