@@ -2,7 +2,8 @@ name: continuous-deployment
 
 on:
   push:
-    tags: []
+    tags:
+      - v*
 
 jobs:
 
@@ -24,27 +25,32 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
   docker:
+    strategy:
+      fail-fast: false
+    env:
+      DOCKER_LOGIN: ${{ github.actor }}
+      DOCKER_REGISTRY: docker.pkg.github.com
+      DOCKER_REPOSITORY: ${{ DOCKER_REGISTRY }}/${{ github.repository }}
+      DOCKER_IMAGE: ${{ DOCKER_REPOSITORY }}/nifi
     runs-on: ubuntu-latest
     steps:
 
-      - name: Get the version
-        id: get_version
+      - id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
 
       - name: Checkout SCM
         uses: actions/checkout@v1
 
-      - name: Login to docker hub as ${{ github.actor }}
-        uses: actions-hub/docker/login@master
-        env:
-          DOCKER_REGISTRY_URL: docker.pkg.github.com
-          DOCKER_USERNAME: ${{ github.actor }}
-          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-
       - name: docker build ${{ steps.get_version.outputs.VERSION }}
         if: success()
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }} .
+        run: docker build -t "$DOCKER_IMAGE":${{ steps.get_version.outputs.VERSION }} .
+
+      - name: docker login
+        run: echo "$GITHUB_TOKEN" | docker login -u "$DOCKER_LOGIN" --password-stdin "$DOCKER_REGISTRY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: docker push ${{ steps.get_version.outputs.VERSION }}
-        if: success()
-        run: docker push docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
+        run: |
+          docker tag "$DOCKER_IMAGE" "$DOCKER_IMAGE":${{ steps.get_version.outputs.VERSION }}
+          docker push "$DOCKER_IMAGE":${{ steps.get_version.outputs.VERSION }}

@@ -31,17 +31,16 @@ jobs:
       - name: Checkout SCM
         uses: actions/checkout@v1
 
-      - name: Login to docker hub as ${{ github.actor }}
-        uses: actions-hub/docker/login@master
-        env:
-          DOCKER_REGISTRY_URL: docker.pkg.github.com
-          DOCKER_USERNAME: ${{ github.actor }}
-          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-
       - name: docker build latest
         if: success()
-        run: docker build -t docker.pkg.github.com/${{ github.repository }}/nifi:latest .
+        run: docker build -t nifi:latest .
+
+      - name: docker login
+        run: echo "$GITHUB_TOKEN" | docker login -u "$DOCKER_LOGIN" --password-stdin "$DOCKER_REGISTRY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: docker push latest
-        if: success()
-        run: docker push docker.pkg.github.com/${{ github.repository }}/nifi:latest
+        run: |
+          docker tag nifi:latest "$DOCKER_IMAGE":latest
+          docker push "$DOCKER_IMAGE":latest
