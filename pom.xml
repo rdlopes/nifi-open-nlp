@@ -133,8 +133,6 @@
                     <extensions>true</extensions>
                     <configuration>
                         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-                        <serverId>github</serverId>
-                        <nexusUrl>${github.deploy.url}</nexusUrl>
                     </configuration>
                 </plugin>
             </plugins>
