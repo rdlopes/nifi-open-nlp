@@ -25,6 +25,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
 
   docker:
+    strategy:
+      fail-fast: false
+    env:
+      DOCKER_LOGIN: ${{ github.actor }}
+      DOCKER_REGISTRY: docker.pkg.github.com
+      DOCKER_REPOSITORY: ${{ DOCKER_REGISTRY }}/${{ github.repository }}
+      DOCKER_IMAGE: ${{ DOCKER_REPOSITORY }}/nifi
     runs-on: ubuntu-latest
     steps:
 
