@@ -40,7 +40,7 @@ jobs:
         env:
           DOCKER_REGISTRY_URL: docker.pkg.github.com
           DOCKER_USERNAME: ${{ github.actor }}
-          DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          DOCKER_PASSWORD: ${{ secrets.LOCAL_TOKEN }}
 
       - name: docker build ${{ steps.get_version.outputs.VERSION }}
         if: success()
