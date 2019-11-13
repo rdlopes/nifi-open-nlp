@@ -49,4 +49,4 @@ jobs:
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push build docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}
+          args: push docker.pkg.github.com/${{ github.repository }}/nifi:${{ steps.get_version.outputs.VERSION }}

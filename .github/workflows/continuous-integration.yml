@@ -46,4 +46,4 @@ jobs:
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push build docker.pkg.github.com/${{ github.repository }}/nifi
+          args: push docker.pkg.github.com/${{ github.repository }}/nifi
