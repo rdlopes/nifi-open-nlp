@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
 
-  build:
+  maven:
     runs-on: ubuntu-latest
     steps:
 
@@ -23,3 +23,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout SCM
+        uses: actions/checkout@v1
+
+      - name: Login to docker hub as ${{ github.actor }}
+        uses: actions-hub/docker/login@master
+        env:
+          DOCKER_REGISTRY_URL: docker.pkg.github.com
+          DOCKER_USERNAME: ${{ github.actor }}
+          DOCKER_PASSWORD: ${{ secrets.LOCAL_TOKEN }}
+
+      - name: docker build ${{ TAG }}
+        if: success()
+        run: docker build -t ${{ TAG }} .
+        env:
+          TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi
+
+      - name: docker push ${{ TAG }}
+        if: success()
+        uses: actions-hub/docker@master
+        with:
+          args: push ${{ TAG }} || ${{ true }}
+        env:
+          TAG: build docker.pkg.github.com/${{ github.actor }}/${{ github.repository }}/nifi

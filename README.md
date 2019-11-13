@@ -66,7 +66,7 @@ models for English language:
 #### NLP training
 
 A new NiFi folder exists under `$NIFI_HOME/training` that contains `tweets.txt`, an example of training data
-for sentiment analysis on tweets (see [Documennt Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat))
+for sentiment analysis on tweets (see [Document Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat))
 taken from [this discussion](https://stackoverflow.com/questions/44781094/sentiment-analysis-with-opennlp) on StackOverflow.
 
 #### NLP model store
