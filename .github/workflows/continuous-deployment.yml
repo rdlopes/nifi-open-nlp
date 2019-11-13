@@ -50,4 +50,4 @@ jobs:
         if: success()
         uses: actions-hub/docker@master
         with:
-          args: push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
+          args: push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} || ${{ true }}
