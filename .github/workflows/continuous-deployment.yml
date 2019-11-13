@@ -2,8 +2,8 @@ name: continuous-deployment
 
 on:
   push:
-    branches:
-      - refs/tags/*
+    tags:
+      - v*.*.*
 
 jobs:
 
