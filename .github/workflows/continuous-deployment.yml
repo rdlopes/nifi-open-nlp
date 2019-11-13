@@ -42,8 +42,11 @@ jobs:
 
       - name: Build & Push Docker image @ version ${{ steps.get_version.outputs.VERSION }}
         run: |
+          echo 'docker login as rdlopes'
           docker login docker.pkg.github.com -u rdlopes -p "${GITHUB_PACKAGE_REGISTRY_TOKEN}"
+          echo 'docker build docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}'
           docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
+          echo 'docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}'
           docker push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
         env:
           GITHUB_PACKAGE_REGISTRY_TOKEN: ${{ secrets.LOCAL_TOKEN }}
