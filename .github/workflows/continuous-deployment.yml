@@ -40,19 +40,19 @@ jobs:
       - name: Checkout SCM
         uses: actions/checkout@v1
 
-      - name: docker build
-        run: actions/docker/cli@master
-        args:
-          - build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
-
-      - name: docker login
-        uses: actions/docker/login@master
+      - name: Login to docker hub as ${{ github.actor }}
+        uses: actions-hub/docker/login@master
         env:
           DOCKER_REGISTRY_URL: docker.pkg.github.com
           DOCKER_USERNAME: ${{ github.actor }}
           DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: docker push
-        uses: actions/docker/cli@master
-        args:
-          - push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
+      - name: docker build ${{ steps.get_version.outputs.VERSION }}
+        if: success()
+        run: docker build -t docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }} .
+
+      - name: docker push ${{ steps.get_version.outputs.VERSION }}
+        if: success()
+        uses: actions-hub/docker@master
+        with:
+          args: push docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi:${{ steps.get_version.outputs.VERSION }}
