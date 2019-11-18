@@ -1,7 +1,5 @@
 name: Continuous Integration
 on: [push, pull_request]
-env:
-  IMAGE_NAME: nifi
 
 jobs:
 
@@ -32,9 +30,8 @@ jobs:
       - name: Log into docker registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: Push docker image
-        if: success()
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/nifi
           VERSION=latest
           echo IMAGE_ID=$IMAGE_ID / VERSION=$VERSION
           docker tag image $IMAGE_ID:$VERSION
