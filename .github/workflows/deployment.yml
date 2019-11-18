@@ -9,7 +9,7 @@ on:
 jobs:
 
   maven:
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout SCM
         uses: actions/checkout@v1
@@ -23,7 +23,7 @@ jobs:
 
   docker:
     needs: maven
-    runs-on: macos-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout SCM
         uses: actions/checkout@v1
