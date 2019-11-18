@@ -5,6 +5,7 @@ import opennlp.tools.langdetect.Language;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
@@ -21,8 +22,8 @@ public class TrainableLanguageDetectorTest extends TrainableProcessorTest<Traina
     }
 
     @Test
-    public void shouldDetectPortuguese() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-langdet.train").getFile());
+    public void shouldDetectPortuguese() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-langdet.train").toString());
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, NAIVE_BAYES_VALUE);
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));

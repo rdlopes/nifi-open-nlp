@@ -6,6 +6,7 @@ import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 import org.rdlopes.processors.opennlp.processors.NLPProcessor;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,16 +50,16 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
     }
 
     @Test
-    public void shouldFindDates() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-date.bin").getFile());
+    public void shouldFindDates() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-date.bin").toString());
         assertProcessorCanFind("date",
                                nameList -> assertThat(nameList).containsExactly("Nov . 29 th"),
                                nameSpans -> assertThat(nameSpans).containsExactly(new Span(42, 46, "date")));
     }
 
     @Test
-    public void shouldFindLocations() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-location.bin").getFile());
+    public void shouldFindLocations() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-location.bin").toString());
         assertProcessorCanFind("location",
                                nameList -> assertThat(nameList).containsExactly("N . V .", "the Netherlands", "Belgium", "N . V"),
                                nameSpans -> assertThat(nameSpans).containsExactly(
@@ -67,24 +68,24 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
     }
 
     @Test
-    public void shouldFindMoney() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-money.bin").getFile());
+    public void shouldFindMoney() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-money.bin").toString());
         assertProcessorCanFind("money",
                                nameList -> assertThat(nameList).containsExactly("$ 800 . 000"),
                                nameSpans -> assertThat(nameSpans).containsExactly(new Span(99, 103, "money")));
     }
 
     @Test
-    public void shouldFindOrganizations() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-organization.bin").getFile());
+    public void shouldFindOrganizations() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-organization.bin").toString());
         assertProcessorCanFind("organization",
                                nameList -> assertThat(nameList).containsExactly("Consolidated Gold Fields PLC"),
                                nameSpans -> assertThat(nameSpans).containsExactly(new Span(127, 131, "organization")));
     }
 
     @Test
-    public void shouldFindPercentage() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-percentage.bin").getFile());
+    public void shouldFindPercentage() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-percentage.bin").toString());
         assertProcessorCanFind("percentage",
                                nameList -> assertThat(nameList).containsExactly("40 %", "10 %", "51 %"),
                                nameSpans -> assertThat(nameSpans).containsExactly(
@@ -92,8 +93,8 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
     }
 
     @Test
-    public void shouldFindPersons() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-person.bin").getFile());
+    public void shouldFindPersons() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-person.bin").toString());
         assertProcessorCanFind("person",
                                nameList -> assertThat(nameList).containsExactly("Pierre Vinken", "Vinken", "Elsevier N", "Rudolph Agnew"),
                                nameSpans -> assertThat(nameSpans).containsExactly(new Span(25, 27, "person"),
@@ -104,8 +105,8 @@ public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTr
     }
 
     @Test
-    public void shouldFindTime() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-ner-time.bin").getFile());
+    public void shouldFindTime() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-ner-time.bin").toString());
         assertProcessorCanFind("time",
                                nameList -> assertThat(nameList).containsExactly("10 : 30", "7 : 00"),
                                nameSpans -> assertThat(nameSpans).containsExactly(new Span(10, 13, "time"),

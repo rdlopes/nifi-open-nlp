@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +23,9 @@ public class TrainableParserTest extends TrainableProcessorTest<TrainableParser>
     }
 
     @Test
-    public void shouldParse() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-parser.train").getFile());
-        testRunner.setProperty(PARSER_HEAD_RULES_FILE_PATH.descriptor, getClass().getResource("/training/en_head_rules").getFile());
+    public void shouldParse() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-parser.train").toString());
+        testRunner.setProperty(PARSER_HEAD_RULES_FILE_PATH.descriptor, getFilePath("/training/en_head_rules").toString());
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();

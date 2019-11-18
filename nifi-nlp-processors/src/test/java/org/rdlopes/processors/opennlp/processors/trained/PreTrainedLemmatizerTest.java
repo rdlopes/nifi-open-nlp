@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class PreTrainedLemmatizerTest extends PreTrainedProcessorTest<PreTrained
     }
 
     @Test
-    public void shouldLemmatizeOpenNLPExample() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-lemmatizer.bin").getFile());
+    public void shouldLemmatizeOpenNLPExample() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-lemmatizer.bin").toString());
         Map<String, String> attributes = new HashMap<>();
         set(POS_TAGGER_TAGS_LIST_KEY, attributes, SAMPLE_TAGS_SIMPLE);
         set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);

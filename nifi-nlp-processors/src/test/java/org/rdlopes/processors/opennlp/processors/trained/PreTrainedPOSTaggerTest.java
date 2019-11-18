@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +22,8 @@ public class PreTrainedPOSTaggerTest extends PreTrainedProcessorTest<PreTrainedP
     }
 
     @Test
-    public void shouldTagPartOfSpeech() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-pos-maxent.bin").getFile());
+    public void shouldTagPartOfSpeech() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-pos-maxent.bin").toString());
         Map<String, String> attributes = new HashMap<>();
         set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
 

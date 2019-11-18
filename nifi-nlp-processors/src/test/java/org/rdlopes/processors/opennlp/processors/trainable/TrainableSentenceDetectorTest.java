@@ -5,6 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,8 +21,8 @@ public class TrainableSentenceDetectorTest extends TrainableProcessorTest<Traina
     }
 
     @Test
-    public void shouldDetectSentenceFromTimesheetQuestion() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-sentdet.train").getFile());
+    public void shouldDetectSentenceFromTimesheetQuestion() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-sentdet.train").toString());
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
         testRunner.assertValid();

@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,8 @@ public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedPars
     }
 
     @Test
-    public void shouldParse() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-parser-chunking.bin").getFile());
+    public void shouldParse() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-parser-chunking.bin").toString());
         testRunner.setProperty(PARSER_PARSES_COUNT.descriptor, "3");
         Map<String, String> attributes = new HashMap<>();
         set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);

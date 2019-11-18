@@ -5,6 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,8 +21,8 @@ public class PreTrainedSentenceDetectorTest extends PreTrainedProcessorTest<PreT
     }
 
     @Test
-    public void shouldDetectSentenceFromTimesheetQuestion() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-sent.bin").getFile());
+    public void shouldDetectSentenceFromTimesheetQuestion() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-sent.bin").toString());
         testRunner.enqueue(SAMPLE_CONTENT);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

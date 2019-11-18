@@ -192,7 +192,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         if (!TRAINABLE_TRAINING_FILE_PATH.isSetIn(validationContext) && !TRAINABLE_TRAINING_DATA.isSetIn(validationContext)) {
             getLogger().warn("missing training data");
             results.add(new ValidationResult.Builder()
-                                .input("file:null;data:null").valid(false)
+                                .input("file:null | data:null").valid(false)
                                 .subject("training").explanation("Trainable processor requires training data or training file")
                                 .build());
 
@@ -204,7 +204,7 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
             } catch (Exception e) {
                 getLogger().warn("training validation error", e);
                 results.add(new ValidationResult.Builder()
-                                    .input(String.format("language:%s;file:%s;data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
+                                    .input(String.format("language:%s | file:%s | data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
                                     .subject("training").explanation(e.getMessage())
                                     .build());
             }

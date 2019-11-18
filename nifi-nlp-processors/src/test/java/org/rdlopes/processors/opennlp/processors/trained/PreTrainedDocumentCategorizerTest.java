@@ -4,6 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class PreTrainedDocumentCategorizerTest extends PreTrainedProcessorTest<P
     }
 
     @Test
-    public void shouldCategorizeTweets() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/en-doccat.bin").getFile());
+    public void shouldCategorizeTweets() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-doccat.bin").toString());
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();

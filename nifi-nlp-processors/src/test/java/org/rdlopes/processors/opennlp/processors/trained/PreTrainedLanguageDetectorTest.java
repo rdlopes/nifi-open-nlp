@@ -5,6 +5,7 @@ import opennlp.tools.langdetect.Language;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -19,8 +20,8 @@ public class PreTrainedLanguageDetectorTest extends PreTrainedProcessorTest<PreT
     }
 
     @Test
-    public void shouldDetectPortuguese() {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getClass().getResource("/models/langdetect-183.bin").getFile());
+    public void shouldDetectPortuguese() throws URISyntaxException {
+        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/langdetect-183.bin").toString());
         testRunner.enqueue("estava em uma marcenaria na Rua Bruno");
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
