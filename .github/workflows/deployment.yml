@@ -33,7 +33,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
       - name: Push docker image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/nifi
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/nifi-open-nlp
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           [ "$VERSION" == "master" ] && VERSION=latest
