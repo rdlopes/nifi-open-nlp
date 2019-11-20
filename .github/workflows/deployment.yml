@@ -1,8 +1,6 @@
 name: Continuous Deployment
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
 
@@ -27,7 +25,7 @@ jobs:
     steps:
       - name: Checkout SCM
         uses: actions/checkout@v1
-      - name: Build local docker image
+      - name: Build local docker image?
         run: docker build . --file Dockerfile --tag image
       - name: Log into docker registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
