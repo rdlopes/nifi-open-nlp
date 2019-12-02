@@ -1,6 +1,6 @@
 # nifi-open-nlp
-[![CI](https://github.com/rdlopes/nifi-open-nlp/workflows/integration/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
-[![CD](https://github.com/rdlopes/nifi-open-nlp/workflows/deployment/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
+[![CI](https://github.com/rdlopes/nifi-open-nlp/workflows/Continuous%20Integration/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
+[![CD](https://github.com/rdlopes/nifi-open-nlp/workflows/Continuous%20Deployment/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
 [![Quality](https://sonarcloud.io/api/project_badges/measure?project=org.rdlopes%3Anifi-open-nlp&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.rdlopes%3Anifi-open-nlp)
 
 A set of [NiFi](https://nifi.apache.org) processors implementing [Apache OpenNLP](https://opennlp.apache.org/) engine tools.
