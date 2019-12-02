@@ -18,23 +18,3 @@ jobs:
         run: mvn --settings settings.xml -B clean install deploy:deploy || ${{ true }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#  docker:
-#    needs: maven
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout SCM
-#        uses: actions/checkout@v1
-#      - name: Build local docker image?
-#        run: docker build . --file Dockerfile --tag image
-#      - name: Log into docker registry
-#        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-#      - name: Push docker image
-#        run: |
-#          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/nifi-open-nlp
-#          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-#          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-#          [ "$VERSION" == "master" ] && VERSION=latest
-#          echo IMAGE_ID=$IMAGE_ID / VERSION=$VERSION
-#          docker tag image $IMAGE_ID:$VERSION
-#          docker push $IMAGE_ID:$VERSION
