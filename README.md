@@ -93,12 +93,12 @@ Add Jitpack repository in your maven project:
 		</repository>
 	</repositories>
 	
-and the maven dependency on the github poject:
+and the maven dependency on the github project:
 
     <dependency>
 	    <groupId>com.github.rdlopes</groupId>
 	    <artifactId>nifi-open-nlp</artifactId>
-	    <version>0.1.3</version>
+	    <version>${nifi-open-nlp.version}</version>
 	</dependency>
 	
 ## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
