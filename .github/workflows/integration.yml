@@ -13,8 +13,8 @@ jobs:
         with: {java-version: 1.8}
       - name: Build with Maven
         run: mvn --settings settings.xml -B install
-      - name: Sonar with Maven
-        run: mvn --settings settings.xml -B sonar:sonar
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
