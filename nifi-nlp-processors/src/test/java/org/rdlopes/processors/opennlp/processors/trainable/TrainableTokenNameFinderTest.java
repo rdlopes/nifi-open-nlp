@@ -5,6 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ public class TrainableTokenNameFinderTest extends TrainableProcessorTest<Trainab
     }
 
     @Test
-    public void shouldFindNames() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-namefind.train").getFile());
+    public void shouldFindNames() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-namefind.train").toString());
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(1));
         testRunner.setProperty(TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(70));
         assertProcessorCanFind("default",

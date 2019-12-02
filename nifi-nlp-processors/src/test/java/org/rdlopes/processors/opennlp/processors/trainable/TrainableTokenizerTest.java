@@ -5,6 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,8 +21,8 @@ public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableToke
     }
 
     @Test
-    public void shouldTokenize() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-token.train").getFile());
+    public void shouldTokenize() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-token.train").toString());
         testRunner.assertValid();
 
         testRunner.enqueue("Sounds like it's not properly thought through!");

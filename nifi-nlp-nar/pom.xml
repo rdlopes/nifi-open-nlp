@@ -6,15 +6,15 @@
     <parent>
         <groupId>org.rdlopes</groupId>
         <artifactId>nifi-open-nlp</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>0.1.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>nifi-nlp-nar</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
     <packaging>nar</packaging>
 
     <properties>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.source.skip>true</maven.source.skip>
         <source.skip>true</source.skip>
     </properties>
 
@@ -22,12 +22,7 @@
         <dependency>
             <groupId>org.rdlopes</groupId>
             <artifactId>nifi-nlp-processors</artifactId>
-            <version>0.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <finalName>${project.artifactId}</finalName>
-    </build>
 
 </project>

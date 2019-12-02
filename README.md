@@ -1,6 +1,5 @@
 # nifi-open-nlp
-[![Build Status](https://travis-ci.org/rdlopes/nifi-open-nlp.svg?branch=master)](https://travis-ci.org/rdlopes/nifi-open-nlp)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=org.rdlopes%3Anifi-open-nlp&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.rdlopes%3Anifi-open-nlp)
+[![Build Status](https://github.com/rdlopes/nifi-open-nlp/workflows/conntinuous-integration/badge.svg)](https://github.com/rdlopes/nifi-open-nlp/actions)
 
 A set of [NiFi](https://nifi.apache.org) processors implementing [Apache OpenNLP](https://opennlp.apache.org/) engine tools.
 
@@ -67,7 +66,7 @@ models for English language:
 #### NLP training
 
 A new NiFi folder exists under `$NIFI_HOME/training` that contains `tweets.txt`, an example of training data
-for sentiment analysis on tweets (see [Documennt Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat))
+for sentiment analysis on tweets (see [Document Categorizer](https://opennlp.apache.org/docs/1.9.1/manual/opennlp.html#tools.doccat))
 taken from [this discussion](https://stackoverflow.com/questions/44781094/sentiment-analysis-with-opennlp) on StackOverflow.
 
 #### NLP model store
@@ -77,6 +76,45 @@ Another new folder under `$NIFI_HOME/model-store` is present and will hold the t
 The rationale is that processors can be trained using both model files, training files and training data so input types differ, 
 but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
 training/evaluation will be explained further.
+
+## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
+
+Now that the beta has kicked in, project can be used as:
+
+* a Maven dependency, declaring reference in POM
+* a Docker container, pulling image from GitHub registry
+
+### As a maven dependency
+
+To use nifi-nlp-nar as a Maven dependency, add
+
+    <dependency>
+      <groupId>org.rdlopes</groupId>
+      <artifactId>nifi-nlp-nar</artifactId>
+      <version>${nifi-open-nlp.version}</version>
+    </dependency>
+
+to your `<dependencies>` section, and add the following repository
+
+    <repository>
+        <id>github</id>
+        <name>GitHub rdlopes Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/rdlopes</url>
+    </repository>
+
+to your `<repositories>` section, then you should have the nar present in your local repo.
+
+### As a Docker container
+
+Use the following command
+
+    docker pull docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
+    
+to start the container, or
+
+    FROM docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
+    
+in your Dockerfile to derive from this project's Dockerfile.
 
 ## Apache NLP tools
 

@@ -3,7 +3,7 @@ services:
   nifi:
     build:
       context: .
-    image: org.rdlopes/nifi
+    image: local/org.rdlopes/nifi
     container_name: nifi
     volumes:
       - type: bind

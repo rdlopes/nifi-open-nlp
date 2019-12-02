@@ -1,0 +1,20 @@
+name: Continuous Integration
+on: [push, pull_request]
+
+jobs:
+
+  maven:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SCM
+        uses: actions/checkout@v1
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with: {java-version: 1.8}
+      - name: Build with Maven
+        run: mvn --settings settings.xml -B install
+      - name: Sonar with Maven
+        run: mvn --settings settings.xml -B sonar:sonar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}

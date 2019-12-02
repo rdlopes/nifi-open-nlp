@@ -5,6 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,8 @@ public class TrainableChunkerTest extends TrainableProcessorTest<TrainableChunke
     }
 
     @Test
-    public void shouldChunk() {
-        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getClass().getResource("/training/en-chunker.train").getFile());
+    public void shouldChunk() throws URISyntaxException {
+        testRunner.setProperty(TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-chunker.train").toString());
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();
