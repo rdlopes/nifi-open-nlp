@@ -22,7 +22,7 @@
                 </repository>
                 <repository>
                     <id>github</id>
-                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <name>GitHub rdlopes Apache Maven Packages</name>
                     <url>https://maven.pkg.github.com/rdlopes</url>
                 </repository>
             </repositories>
