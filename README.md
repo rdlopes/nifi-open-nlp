@@ -103,42 +103,7 @@ and the maven dependency on the github poject:
 	
 ## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
 
-Now that the beta has kicked in, project can be used as:
-
-* a Maven dependency, declaring reference in POM
-* a Docker container, pulling image from GitHub registry
-
-### As a maven dependency
-
-To use nifi-nlp-nar as a Maven dependency, add
-
-    <dependency>
-      <groupId>org.rdlopes</groupId>
-      <artifactId>nifi-nlp-nar</artifactId>
-      <version>${nifi-open-nlp.version}</version>
-    </dependency>
-
-to your `<dependencies>` section, and add the following repository
-
-    <repository>
-        <id>github</id>
-        <name>GitHub rdlopes Apache Maven Packages</name>
-        <url>https://maven.pkg.github.com/rdlopes</url>
-    </repository>
-
-to your `<repositories>` section, then you should have the nar present in your local repo.
-
-### As a Docker container
-
-Use the following command
-
-    docker pull docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
-    
-to start the container, or
-
-    FROM docker.pkg.github.com/rdlopes/nifi-open-nlp/nifi-open-nlp:docker-base-layer
-    
-in your Dockerfile to derive from this project's Dockerfile.
+The feature is temporarily disabled, I'm waiting for GitHub feedback on few issues.
 
 ## Apache NLP tools
 
