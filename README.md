@@ -82,6 +82,25 @@ The rationale is that processors can be trained using both model files, training
 but at the end of the day, it all ends in a model file that can be stored and reused by the processors. Lifecycle of processors
 training/evaluation will be explained further.
 
+## Importing from [Jitpack](https://jitpack.io/)
+
+Add Jitpack repository in your maven project:
+
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+	
+and the maven dependency on the github poject:
+
+    <dependency>
+	    <groupId>com.github.rdlopes</groupId>
+	    <artifactId>nifi-open-nlp</artifactId>
+	    <version>0.1.3</version>
+	</dependency>
+	
 ## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
 
 Now that the beta has kicked in, project can be used as:
