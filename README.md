@@ -99,6 +99,7 @@ and the maven dependency on the github project:
 	    <groupId>com.github.rdlopes</groupId>
 	    <artifactId>nifi-open-nlp</artifactId>
 	    <version>${nifi-open-nlp.version}</version>
+	    <type>nar</type>
 	</dependency>
 	
 ## Importing from [GitHub Package Registry](https://github.com/features/package-registry)
