@@ -3,8 +3,8 @@ services:
   nifi:
     build:
       context: .
-    image: local/org.rdlopes/nifi
-    container_name: nifi
+    image: local/rdlopes/nifi-open-nlp:latest
+    container_name: nifi-open-nlp
     volumes:
       - type: bind
         source: ./nifi-local-data/conf
@@ -12,9 +12,6 @@ services:
       - type: bind
         source: ./nifi-local-data/models
         target: /opt/nifi/nifi-current/models
-      - type: bind
-        source: ./nifi-local-data/model-store
-        target: /opt/nifi/nifi-current/nlp/model-store
       - type: bind
         source: ./nifi-local-data/training
         target: /opt/nifi/nifi-current/training

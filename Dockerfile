@@ -4,7 +4,7 @@ WORKDIR /tmp/
 RUN mvn -B clean package -DskipTests
 
 FROM apache/nifi:latest
-COPY --from=MAVEN_TOOL_CHAIN /tmp/nifi-nlp-nar/target/nifi-nlp-nar.nar lib/nifi-nlp-nar.nar
+COPY --from=MAVEN_TOOL_CHAIN /tmp/*-nar/target/*-nar.nar lib/
 
 #############################################################################################
 # !!! container expects a folder containing NLP models in /opt/nifi/nifi-current/models !!! #

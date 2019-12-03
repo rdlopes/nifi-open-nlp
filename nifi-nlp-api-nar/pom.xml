@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -9,24 +10,23 @@
         <version>0.1.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>nifi-nlp-nar</artifactId>
+    <artifactId>nifi-nlp-api-nar</artifactId>
     <packaging>nar</packaging>
 
     <properties>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <maven.source.skip>true</maven.source.skip>
         <source.skip>true</source.skip>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.rdlopes</groupId>
-            <artifactId>nifi-nlp-api-nar</artifactId>
+            <groupId>org.apache.nifi</groupId>
+            <artifactId>nifi-standard-services-api-nar</artifactId>
             <type>nar</type>
         </dependency>
         <dependency>
             <groupId>org.rdlopes</groupId>
-            <artifactId>nifi-nlp-processors</artifactId>
+            <artifactId>nifi-nlp-services</artifactId>
         </dependency>
     </dependencies>
 
