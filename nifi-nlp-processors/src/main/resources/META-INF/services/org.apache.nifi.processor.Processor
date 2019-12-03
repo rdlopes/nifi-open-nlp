@@ -17,3 +17,4 @@ org.rdlopes.opennlp.processors.trained.PreTrainedParser
 org.rdlopes.opennlp.processors.trained.PreTrainedPOSTagger
 org.rdlopes.opennlp.processors.trained.PreTrainedSentenceDetector
 org.rdlopes.opennlp.processors.trained.PreTrainedTokenizer
+org.rdlopes.opennlp.processors.uima.ExecutePipeline

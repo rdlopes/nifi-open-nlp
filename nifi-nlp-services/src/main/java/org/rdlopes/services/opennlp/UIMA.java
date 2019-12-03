@@ -23,7 +23,7 @@ import org.apache.nifi.processor.exception.ProcessException;
 
 @Tags({"example"})
 @CapabilityDescription("Example Service API.")
-public interface UIMAPipeline extends ControllerService {
+public interface UIMA extends ControllerService {
 
     void execute() throws ProcessException;
 
