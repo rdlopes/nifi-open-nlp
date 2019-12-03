@@ -5,9 +5,7 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 import org.rdlopes.opennlp.common.NLPAttribute;
-import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,14 +15,12 @@ import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED
 public class TrainableTokenizerTest extends TrainableProcessorTest<TrainableTokenizer> {
 
     public TrainableTokenizerTest() {
-        super(TrainableTokenizer.class);
+        super(TrainableTokenizer.class, "/training/en-token.train");
     }
 
     @Test
-    public void shouldTokenize() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-token.train").toString());
+    public void shouldTokenize() {
         testRunner.assertValid();
-
         testRunner.enqueue("Sounds like it's not properly thought through!");
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);

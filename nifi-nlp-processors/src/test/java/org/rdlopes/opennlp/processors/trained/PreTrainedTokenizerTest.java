@@ -5,24 +5,23 @@ import opennlp.tools.util.Span;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.rdlopes.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
 public class PreTrainedTokenizerTest extends PreTrainedProcessorTest<PreTrainedTokenizer> {
 
     public PreTrainedTokenizerTest() {
-        super(PreTrainedTokenizer.class);
+        super(PreTrainedTokenizer.class, "/models/en-token.bin");
     }
 
     @Test
-    public void shouldTokenize() throws URISyntaxException {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-token.bin").toString());
+    public void shouldTokenize() {
+        testRunner.assertValid();
+
         testRunner.enqueue(SAMPLE_CONTENT);
         testRunner.run();
         testRunner.assertTransferCount(RELATIONSHIP_UNMATCHED, 0);
@@ -31,9 +30,11 @@ public class PreTrainedTokenizerTest extends PreTrainedProcessorTest<PreTrainedT
         MockFlowFile flowFile = testRunner.getFlowFilesForRelationship(RELATIONSHIP_SUCCESS).iterator().next();
 
         flowFile.assertAttributeExists(TOKENIZER_TOKENS_LIST_KEY);
-        List<String> tokensList = get(TOKENIZER_TOKENS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {});
+        List<String> tokensList = get(TOKENIZER_TOKENS_LIST_KEY, flowFile.getAttributes(), new TypeToken<List<String>>() {
+        });
         flowFile.assertAttributeExists(TOKENIZER_TOKENS_SPAN_KEY);
-        List<Span> tokenSpans = get(TOKENIZER_TOKENS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {});
+        List<Span> tokenSpans = get(TOKENIZER_TOKENS_SPAN_KEY, flowFile.getAttributes(), new TypeToken<List<Span>>() {
+        });
 
         assertThat(tokensList).containsExactly(
                 "=", "=", "Please", "notice", "that", "this", "announcement", "will", "be", "updated", "at", "10:30", "AM", ",", "3:00", "PM", "and", "7:00", "PM", "=", "=", "Pierre", "Vinken", ",",

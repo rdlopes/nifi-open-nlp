@@ -5,12 +5,15 @@ import org.apache.nifi.controller.AbstractControllerService;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.rdlopes.services.opennlp.UIMA;
 
+import java.io.InputStream;
+import java.util.Map;
+
 @Slf4j
 public class UIMAService extends AbstractControllerService implements UIMA {
 
     @Override
-    public void execute() throws ProcessException {
-        log.debug("executing pipeline");
+    public void execute(InputStream in, Map<String, String> attributes) throws ProcessException {
+        log.debug("executing pipeline given by input {}", in);
     }
 
 }

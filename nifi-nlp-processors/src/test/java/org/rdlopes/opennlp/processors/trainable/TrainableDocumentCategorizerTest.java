@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +22,11 @@ import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED
 public class TrainableDocumentCategorizerTest extends TrainableProcessorTest<TrainableDocumentCategorizer> {
 
     public TrainableDocumentCategorizerTest() {
-        super(TrainableDocumentCategorizer.class);
+        super(TrainableDocumentCategorizer.class, "/training/en-doccat.train");
     }
 
     @Test
-    public void shouldCategorizeTweets() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-doccat.train").toString());
+    public void shouldCategorizeTweets() {
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, NAIVE_BAYES_VALUE);
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
         testRunner.assertValid();

@@ -16,12 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfiguredTokenizer> {
 
     public PreConfiguredTokenizerTest() {
-        super(PreConfiguredTokenizer.class);
+        super(PreConfiguredTokenizer.class, "", false);
     }
 
     @Test
     public void shouldTokenizeWithSimpleTokenizer() {
         testRunner.setProperty(NLPProperty.TOKENIZE_TOKENIZER_TYPE.descriptor, TokenizerType.SIMPLE.name());
+        testRunner.assertValid();
+
         testRunner.enqueue(SAMPLE_CONTENT);
         testRunner.run();
         testRunner.assertTransferCount(BaseProcessor.RELATIONSHIP_UNMATCHED, 0);
@@ -84,6 +86,8 @@ public class PreConfiguredTokenizerTest extends PreTrainedProcessorTest<PreConfi
     @Test
     public void shouldTokenizeWithWhitespaceTokenizer() {
         testRunner.setProperty(NLPProperty.TOKENIZE_TOKENIZER_TYPE.descriptor, TokenizerType.WHITESPACE.name());
+        testRunner.assertValid();
+
         testRunner.enqueue(SAMPLE_CONTENT);
         testRunner.run();
         testRunner.assertTransferCount(BaseProcessor.RELATIONSHIP_UNMATCHED, 0);

@@ -6,9 +6,7 @@ import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
-import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TrainableChunkerTest extends TrainableProcessorTest<TrainableChunker> {
 
     public TrainableChunkerTest() {
-        super(TrainableChunker.class);
+        super(TrainableChunker.class, "/training/en-chunker.train");
     }
 
     @Test
-    public void shouldChunk() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-chunker.train").toString());
+    public void shouldChunk() {
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();

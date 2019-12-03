@@ -8,7 +8,6 @@ import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static opennlp.tools.ml.naivebayes.NaiveBayesTrainer.NAIVE_BAYES_VALUE;
@@ -17,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TrainableLanguageDetectorTest extends TrainableProcessorTest<TrainableLanguageDetector> {
 
     public TrainableLanguageDetectorTest() {
-        super(TrainableLanguageDetector.class);
+        super(TrainableLanguageDetector.class, "/training/en-langdet.train");
     }
 
     @Test
-    public void shouldDetectPortuguese() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-langdet.train").toString());
+    public void shouldDetectPortuguese() {
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, NAIVE_BAYES_VALUE);
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));

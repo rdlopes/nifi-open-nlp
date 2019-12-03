@@ -17,12 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TrainableParserTest extends TrainableProcessorTest<TrainableParser> {
 
     public TrainableParserTest() {
-        super(TrainableParser.class);
+        super(TrainableParser.class, "/training/en-parser.train");
     }
 
     @Test
     public void shouldParse() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-parser.train").toString());
         testRunner.setProperty(NLPProperty.PARSER_HEAD_RULES_FILE_PATH.descriptor, getFilePath("/training/en_head_rules").toString());
         testRunner.assertValid();
 

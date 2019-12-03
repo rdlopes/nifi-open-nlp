@@ -7,7 +7,6 @@ import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TrainableLemmatizerTest extends TrainableProcessorTest<TrainableLemmatizer> {
 
     public TrainableLemmatizerTest() {
-        super(TrainableLemmatizer.class);
+        super(TrainableLemmatizer.class, "/training/en-lemma.train");
     }
 
     @Test
-    public void shouldLemmatizeOpenNLPExample() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-lemma.train").toString());
+    public void shouldLemmatizeOpenNLPExample() {
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(5));
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
         testRunner.assertValid();

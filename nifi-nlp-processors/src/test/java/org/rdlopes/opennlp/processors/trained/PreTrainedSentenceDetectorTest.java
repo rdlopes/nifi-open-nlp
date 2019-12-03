@@ -6,9 +6,7 @@ import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
-import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,12 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreTrainedSentenceDetectorTest extends PreTrainedProcessorTest<PreTrainedSentenceDetector> {
 
     public PreTrainedSentenceDetectorTest() {
-        super(PreTrainedSentenceDetector.class);
+        super(PreTrainedSentenceDetector.class, "/models/en-sent.bin");
     }
 
     @Test
-    public void shouldDetectSentenceFromTimesheetQuestion() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-sent.bin").toString());
+    public void shouldDetectSentenceFromTimesheetQuestion() {
+        testRunner.assertValid();
+
         testRunner.enqueue(SAMPLE_CONTENT);
         testRunner.run();
         testRunner.assertTransferCount(BaseProcessor.RELATIONSHIP_UNMATCHED, 0);

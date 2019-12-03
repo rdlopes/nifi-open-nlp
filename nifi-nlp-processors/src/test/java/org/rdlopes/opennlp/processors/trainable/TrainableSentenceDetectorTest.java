@@ -8,7 +8,6 @@ import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,12 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TrainableSentenceDetectorTest extends TrainableProcessorTest<TrainableSentenceDetector> {
 
     public TrainableSentenceDetectorTest() {
-        super(TrainableSentenceDetector.class);
+        super(TrainableSentenceDetector.class, "/training/en-sentdet.train");
     }
 
     @Test
-    public void shouldDetectSentenceFromTimesheetQuestion() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-sentdet.train").toString());
+    public void shouldDetectSentenceFromTimesheetQuestion() {
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(0));
         testRunner.assertValid();

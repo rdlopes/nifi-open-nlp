@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PreTrainedTokenNameFinderTest extends PreTrainedProcessorTest<PreTrainedTokenNameFinder> {
     public PreTrainedTokenNameFinderTest() {
-        super(PreTrainedTokenNameFinder.class);
+        super(PreTrainedTokenNameFinder.class, "/models/en-ner-person.bin");
     }
 
     private void assertProcessorCanFind(String nameType,

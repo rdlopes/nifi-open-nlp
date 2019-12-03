@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +18,11 @@ import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED
 public class TrainablePOSTaggerTest extends TrainableProcessorTest<TrainablePOSTagger> {
 
     public TrainablePOSTaggerTest() {
-        super(TrainablePOSTagger.class);
+        super(TrainablePOSTagger.class, "/training/en-tagpos.train");
     }
 
     @Test
-    public void shouldTagPOS() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_FILE_PATH.descriptor, getFilePath("/training/en-tagpos.train").toString());
+    public void shouldTagPOS() {
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ALGORITHM.descriptor, GISTrainer.MAXENT_VALUE);
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_ITERATIONS.descriptor, String.valueOf(100));
         testRunner.setProperty(NLPProperty.TRAINABLE_TRAINING_PARAM_CUTOFF.descriptor, String.valueOf(5));

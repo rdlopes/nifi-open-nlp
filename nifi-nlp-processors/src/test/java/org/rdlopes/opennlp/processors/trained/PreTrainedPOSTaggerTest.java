@@ -4,26 +4,25 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.rdlopes.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
 public class PreTrainedPOSTaggerTest extends PreTrainedProcessorTest<PreTrainedPOSTagger> {
 
     public PreTrainedPOSTaggerTest() {
-        super(PreTrainedPOSTagger.class);
+        super(PreTrainedPOSTagger.class, "/models/en-pos-maxent.bin");
     }
 
     @Test
-    public void shouldTagPartOfSpeech() throws URISyntaxException {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-pos-maxent.bin").toString());
+    public void shouldTagPartOfSpeech() {
+        testRunner.assertValid();
+
         Map<String, String> attributes = new HashMap<>();
         set(TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
 

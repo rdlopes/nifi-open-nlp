@@ -4,7 +4,6 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,19 +14,17 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.rdlopes.opennlp.common.NLPAttribute.*;
-import static org.rdlopes.opennlp.common.NLPProperty.TRAINED_MODEL_FILE_PATH;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_SUCCESS;
 import static org.rdlopes.opennlp.processors.NLPProcessor.RELATIONSHIP_UNMATCHED;
 
 public class PreTrainedDocumentCategorizerTest extends PreTrainedProcessorTest<PreTrainedDocumentCategorizer> {
 
     public PreTrainedDocumentCategorizerTest() {
-        super(PreTrainedDocumentCategorizer.class);
+        super(PreTrainedDocumentCategorizer.class, "/models/en-doccat.bin");
     }
 
     @Test
-    public void shouldCategorizeTweets() throws URISyntaxException {
-        testRunner.setProperty(TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-doccat.bin").toString());
+    public void shouldCategorizeTweets() {
         testRunner.assertValid();
 
         Map<String, String> attributes = new HashMap<>();

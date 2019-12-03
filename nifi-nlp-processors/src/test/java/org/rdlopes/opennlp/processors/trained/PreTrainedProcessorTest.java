@@ -1,5 +1,6 @@
 package org.rdlopes.opennlp.processors.trained;
 
+import org.rdlopes.opennlp.common.NLPProperty;
 import org.rdlopes.opennlp.processors.NLPProcessor;
 import org.rdlopes.opennlp.processors.NLPProcessorTest;
 
@@ -38,7 +39,25 @@ public abstract class PreTrainedProcessorTest<P extends NLPProcessor<?, ?>> exte
             "than", "$", "800", ".", "000", "(", "1", ".", "000", ".", "000", "euros", ",", "900", ".", "000", "pounds", ")", ".", "Rudolph", "Agnew", ",", "55", "years", "old", "and", "former",
             "chairman", "of", "Consolidated", "Gold", "Fields", "PLC", ",", "was", "named", "a", "director", "of", "this", "British", "industrial", "conglomerate", "."};
 
-    PreTrainedProcessorTest(Class<P> processorClass) {
+    private final String modelFilePath;
+    private final boolean requiresModel;
+
+    protected PreTrainedProcessorTest(Class<P> processorClass, String modelFilePath, boolean requiresModel) {
         super(processorClass);
+        this.modelFilePath = modelFilePath;
+        this.requiresModel = requiresModel;
     }
+
+    protected PreTrainedProcessorTest(Class<P> processorClass, String modelFilePath) {
+        this(processorClass, modelFilePath, true);
+    }
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+        if (requiresModel) {
+            testRunner.setProperty(NLPProperty.TRAINED_MODEL_FILE_PATH.descriptor, getFilePath(modelFilePath).toString());
+        }
+    }
+
 }

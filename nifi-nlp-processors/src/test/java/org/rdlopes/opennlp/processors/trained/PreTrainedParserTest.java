@@ -7,7 +7,6 @@ import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PreTrainedParserTest extends PreTrainedProcessorTest<PreTrainedParser> {
 
     public PreTrainedParserTest() {
-        super(PreTrainedParser.class);
+        super(PreTrainedParser.class, "/models/en-parser-chunking.bin");
     }
 
     @Test
-    public void shouldParse() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-parser-chunking.bin").toString());
+    public void shouldParse() {
         testRunner.setProperty(NLPProperty.PARSER_PARSES_COUNT.descriptor, "3");
+        testRunner.assertValid();
+
         Map<String, String> attributes = new HashMap<>();
         NLPAttribute.set(NLPAttribute.TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);
 

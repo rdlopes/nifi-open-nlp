@@ -6,9 +6,7 @@ import org.apache.nifi.util.MockFlowFile;
 import org.junit.Test;
 import org.rdlopes.opennlp.common.BaseProcessor;
 import org.rdlopes.opennlp.common.NLPAttribute;
-import org.rdlopes.opennlp.common.NLPProperty;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class PreTrainedChunkerTest extends PreTrainedProcessorTest<PreTrainedChunker> {
     public PreTrainedChunkerTest() {
-        super(PreTrainedChunker.class);
+        super(PreTrainedChunker.class, "/models/en-chunker.bin");
     }
 
     @Test
-    public void shouldChunk() throws URISyntaxException {
-        testRunner.setProperty(NLPProperty.TRAINED_MODEL_FILE_PATH.descriptor, getFilePath("/models/en-chunker.bin").toString());
+    public void shouldChunk() {
+        testRunner.assertValid();
+
         Map<String, String> attributes = new HashMap<>();
         NLPAttribute.set(NLPAttribute.POS_TAGGER_TAGS_LIST_KEY, attributes, SAMPLE_TAGS_SIMPLE);
         NLPAttribute.set(NLPAttribute.TOKENIZER_TOKENS_LIST_KEY, attributes, SAMPLE_TOKENS_SIMPLE);

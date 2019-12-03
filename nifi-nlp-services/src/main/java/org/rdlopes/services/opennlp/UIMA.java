@@ -21,10 +21,13 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.controller.ControllerService;
 import org.apache.nifi.processor.exception.ProcessException;
 
+import java.io.InputStream;
+import java.util.Map;
+
 @Tags({"example"})
 @CapabilityDescription("Example Service API.")
 public interface UIMA extends ControllerService {
 
-    void execute() throws ProcessException;
+    void execute(InputStream in, Map<String, String> attributes) throws ProcessException;
 
 }

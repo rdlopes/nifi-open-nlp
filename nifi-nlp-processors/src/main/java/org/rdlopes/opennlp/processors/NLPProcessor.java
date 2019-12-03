@@ -13,22 +13,14 @@ import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.components.ValidationContext;
 import org.apache.nifi.components.ValidationResult;
-import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessContext;
-import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.Relationship;
 import org.rdlopes.opennlp.common.BaseProcessor;
-import org.rdlopes.opennlp.common.NLPAttribute;
 import org.rdlopes.opennlp.tools.NLPTool;
 
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.nio.file.Paths.get;
@@ -102,26 +94,26 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
     @Override
     public List<PropertyDescriptor> getSupportedPropertyDescriptors() {
         return trainable ?
-               Stream.of(
-                       COMMON_CHARACTER_SET,
-                       COMMON_MODELS_STORAGE_DIRECTORY,
-                       TRAINABLE_TRAINING_LANGUAGE,
-                       TRAINABLE_TRAINING_PARAM_CUTOFF,
-                       TRAINABLE_TRAINING_PARAM_ITERATIONS,
-                       TRAINABLE_TRAINING_PARAM_ALGORITHM,
-                       TRAINABLE_TRAINING_PARAM_VERBOSE,
-                       TRAINABLE_TRAINING_PARAM_THREADS,
-                       TRAINABLE_TRAINING_PARAM_TYPE,
-                       TRAINABLE_TRAINING_FILE_PATH,
-                       TRAINABLE_TRAINING_DATA)
-                     .map(p -> p.descriptor)
-                     .collect(toList()) :
-               Stream.of(
-                       COMMON_CHARACTER_SET,
-                       COMMON_MODELS_STORAGE_DIRECTORY,
-                       TRAINED_MODEL_FILE_PATH)
-                     .map(p -> p.descriptor)
-                     .collect(toList());
+                Stream.of(
+                        COMMON_CHARACTER_SET,
+                        COMMON_MODELS_STORAGE_DIRECTORY,
+                        TRAINABLE_TRAINING_LANGUAGE,
+                        TRAINABLE_TRAINING_PARAM_CUTOFF,
+                        TRAINABLE_TRAINING_PARAM_ITERATIONS,
+                        TRAINABLE_TRAINING_PARAM_ALGORITHM,
+                        TRAINABLE_TRAINING_PARAM_VERBOSE,
+                        TRAINABLE_TRAINING_PARAM_THREADS,
+                        TRAINABLE_TRAINING_PARAM_TYPE,
+                        TRAINABLE_TRAINING_FILE_PATH,
+                        TRAINABLE_TRAINING_DATA)
+                        .map(p -> p.descriptor)
+                        .collect(toList()) :
+                Stream.of(
+                        COMMON_CHARACTER_SET,
+                        COMMON_MODELS_STORAGE_DIRECTORY,
+                        TRAINED_MODEL_FILE_PATH)
+                        .map(p -> p.descriptor)
+                        .collect(toList());
     }
 
     @OnRemoved
@@ -136,32 +128,6 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         // no loading of the model here - to avoid keeping model in memory
     }
 
-    @Override
-    public void onTrigger(ProcessContext processContext, ProcessSession processSession) {
-        FlowFile flowFile = Optional.ofNullable(processSession.get())
-                                    .orElseGet(processSession::create);
-        final ConcurrentMap<String, String> attributes = new ConcurrentHashMap<>(flowFile.getAttributes());
-        final Charset charset = COMMON_CHARACTER_SET.getCharsetFrom(processContext);
-        Relationship relationship = RELATIONSHIP_UNMATCHED;
-
-        try {
-            processSession.read(flowFile, in -> attributes.putAll(nlp.processContent(processContext, in, charset, attributes)));
-            flowFile = processSession.putAllAttributes(flowFile, attributes);
-            relationship = RELATIONSHIP_SUCCESS;
-            getLogger().debug("onTrigger | flow file content evaluated: {}", new Object[]{attributes});
-
-        } catch (Exception e) {
-            flowFile = NLPAttribute.set(NLP_EVALUATION_ERROR_KEY, processSession, flowFile, e.getMessage());
-            relationship = RELATIONSHIP_UNMATCHED;
-            getLogger().warn("Error while evaluating content", e);
-
-        } finally {
-            processSession.getProvenanceReporter().route(flowFile, relationship);
-            processSession.transfer(flowFile, relationship);
-            getLogger().info("Routing {} to {}", new Object[]{flowFile, relationship});
-        }
-    }
-
     protected void validatePreTrainedModel(ValidationContext validationContext, Collection<ValidationResult> results) {
         final Path trainedModelPath = get(TRAINED_MODEL_FILE_PATH.getStringFrom(validationContext));
         try {
@@ -169,9 +135,9 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         } catch (Exception e) {
             getLogger().warn("pre-trained validation error", e);
             results.add(new ValidationResult.Builder()
-                                .input(trainedModelPath.toString()).valid(false)
-                                .subject("pre-trained").explanation(e.getMessage())
-                                .build());
+                    .input(trainedModelPath.toString()).valid(false)
+                    .subject("pre-trained").explanation(e.getMessage())
+                    .build());
         }
     }
 
@@ -182,9 +148,9 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
         if (!TRAINABLE_TRAINING_FILE_PATH.isSetIn(validationContext) && !TRAINABLE_TRAINING_DATA.isSetIn(validationContext)) {
             getLogger().warn("missing training data");
             results.add(new ValidationResult.Builder()
-                                .input("file:null | data:null").valid(false)
-                                .subject("training").explanation("Trainable processor requires training data or training file")
-                                .build());
+                    .input("file:null | data:null").valid(false)
+                    .subject("training").explanation("Trainable processor requires training data or training file")
+                    .build());
 
         } else {
             final String trainingFilePath = TRAINABLE_TRAINING_FILE_PATH.getStringFrom(validationContext);
@@ -194,11 +160,17 @@ public abstract class NLPProcessor<M extends BaseModel, T extends NLPTool<M>> ex
             } catch (Exception e) {
                 getLogger().warn("training validation error", e);
                 results.add(new ValidationResult.Builder()
-                                    .input(String.format("language:%s | file:%s | data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
-                                    .subject("training").explanation(e.getMessage())
-                                    .build());
+                        .input(String.format("language:%s | file:%s | data:%s", trainingLanguage, trainingFilePath, trainingData)).valid(false)
+                        .subject("training").explanation(e.getMessage())
+                        .build());
             }
         }
     }
 
+    @Override
+    protected void processInput(ProcessContext processContext, InputStream in, Map<String, String> attributes) {
+        final Charset charset = COMMON_CHARACTER_SET.getCharsetFrom(processContext);
+        final Map<String, String> evaluation = nlp.processContent(processContext, in, charset, attributes);
+        attributes.putAll(evaluation);
+    }
 }
